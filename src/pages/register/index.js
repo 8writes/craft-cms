@@ -1,6 +1,5 @@
 // ** React Imports
 import { useState, Fragment } from 'react'
-import zxcvbn from 'zxcvbn'
 import { useRouter } from 'next/router'
 
 // ** Import Supabase client

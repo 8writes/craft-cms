@@ -30,7 +30,6 @@ import 'react-perfect-scrollbar/dist/css/styles.css'
 import '../../styles/globals.css'
 import { UserProvider, useUser } from 'src/@core/context/userDataContext'
 import { useEffect } from 'react'
-import { useState } from 'react'
 
 import Cookies from 'js-cookie';
 
@@ -74,7 +73,7 @@ const App = props => {
       // Redirect to login page
       router.push('/login');
     }
-  }, []);
+  }, [router]);
 
   return (
     <CacheProvider value={emotionCache}>
