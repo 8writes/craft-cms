@@ -210,7 +210,6 @@ const RegisterPage = () => {
               sx={{ marginBottom: 4 }}
             />
             <TextField
-              autoFocus
               name='lastName'
               type='text'
               fullWidth
@@ -232,7 +231,6 @@ const RegisterPage = () => {
               sx={{ marginBottom: 4 }}
             />
              <TextField
-              autoFocus
               name='storeName'
               type='text'
               fullWidth
