@@ -412,7 +412,6 @@ const FormLayoutsSeparator = () => {
                 fullWidth
                 label='Product Name'
                 placeholder='Input Product Name'
-                autoFocus
                 id='productName'
                 name='productName'
                 type='text'
