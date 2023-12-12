@@ -222,7 +222,8 @@ const FormLayoutsSeparator = () => {
         setSuccess('')
       }, 9000)
 
-      // clearForm();
+       clearForm();
+      
       setFormDisabled(false)
       setLoading(false)
     }

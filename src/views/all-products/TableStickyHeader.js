@@ -41,7 +41,8 @@ const columns = [
     label: 'Price (₦)',
     format: value => value.toLocaleString('en-US')
   },
-  { id: 'stock', label: 'Inventory' }
+  { id: 'stock', label: 'Inventory' },
+   { id: 'action', label: '' }
 ]
 
 const TableStickyHeader = () => {
@@ -228,9 +229,12 @@ const TableStickyHeader = () => {
                     
                   );
                 })}
-                <TableCell>
+                <TableCell sx={{display: 'grid', gap: '5px'}}>
                   <LoadingButton size='small' variant='outlined' onClick={() => handleDelete(row.id)}>
                     Delete
+                  </LoadingButton>
+                  <LoadingButton size='small' variant='outlined'>
+                    Edit
                   </LoadingButton>
                 </TableCell>
               </TableRow>
