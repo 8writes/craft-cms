@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { v4 as uuidv4 } from 'uuid'
-import { createClient } from '@supabase/supabase-js'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
@@ -25,7 +24,12 @@ import Link from 'next/link'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined'
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {

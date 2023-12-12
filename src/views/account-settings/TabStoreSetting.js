@@ -1,7 +1,6 @@
 // ** React Imports
 import { useState } from 'react'
 import { useUser } from 'src/@core/context/userDataContext'
-import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
@@ -11,11 +10,12 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Typography from '@mui/material/Typography'
+import { createClient } from '@supabase/supabase-js';
 
-import { createClient } from '@supabase/supabase-js'
-import Link from 'next/link'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {

@@ -1,9 +1,7 @@
 // ** React Imports
-import { useState } from 'react'
 
 // ** MUI Imports
 import Card from '@mui/material/Card'
-import Grid from '@mui/material/Grid'
 
 // ** Demo Components Imports
 

@@ -2,8 +2,6 @@
 import Head from 'next/head'
 import { Router, useRouter } from 'next/router'
 
-import { createClient } from '@supabase/supabase-js'
-
 // ** Loader Import
 import NProgress from 'nprogress'
 
@@ -48,8 +46,6 @@ if (themeConfig.routingLoader) {
   })
 }
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-
 // ** Configure JSS & ClassName
 const App = props => {
   const router = useRouter()
@@ -73,7 +69,7 @@ const App = props => {
       // Redirect to login page
       router.push('/login');
     }
-  }, [router]);
+  }, []);
 
   return (
     <CacheProvider value={emotionCache}>

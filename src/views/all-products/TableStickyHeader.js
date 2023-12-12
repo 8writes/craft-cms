@@ -1,8 +1,6 @@
 // ** React Imports
 import { useState, useEffect } from 'react'
 
-import { createClient } from '@supabase/supabase-js'
-
 // ** MUI Imports
 import Paper from '@mui/material/Paper'
 import Grid from '@mui/material/Grid'
@@ -20,7 +18,12 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import IntroHeading from './IntroHeading'
 import { Alert, AlertTitle, Typography } from '@mui/material'
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 let idCounter = 0
 
