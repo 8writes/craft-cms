@@ -4,7 +4,6 @@ import { useState, Fragment } from 'react'
 // ** Next Import
 import { useRouter } from 'next/router'
 
-
 // ** Import Supabase client
 import { createClient } from '@supabase/supabase-js'
 
@@ -25,6 +24,7 @@ import Typography from '@mui/material/Typography'
 import CogOutline from 'mdi-material-ui/CogOutline'
 import LogoutVariant from 'mdi-material-ui/LogoutVariant'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
+import Link from 'next/link'
 
 // ** Styled Components
 const BadgeContentSpan = styled('span')(({ theme }) => ({
@@ -46,11 +46,7 @@ const UserDropdown = () => {
     setAnchorEl(event.currentTarget)
   }
 
-  const handleDropdownClose = url => {
-    if (url) {
-      router.push(url)
-      handleLogout()
-    }
+  const handleDropdownClose = () => {
     setAnchorEl(null)
   }
 
@@ -71,12 +67,14 @@ const UserDropdown = () => {
   const handleLogout = async () => {
     try {
       const { error } = await supabase.auth.signOut()
-      if (error) { 
+      if (error) {
         throw error
       }
     } catch (error) {
-        console.error('Error fetching data:', error.message)
-      }
+      console.error('Error fetching data:', error.message)
+    } finally {
+      router.push('/login')
+    }
   }
 
   return (
@@ -132,9 +130,14 @@ const UserDropdown = () => {
           </Box>
         </MenuItem>
         <Divider />
-        <MenuItem sx={{ py: 2 }} onClick={() => handleDropdownClose('/login')}>
-          <LogoutVariant sx={{ marginRight: 2, fontSize: '1.375rem', color: 'text.secondary' }} />
-          Logout
+
+        <MenuItem sx={{ py: 2 }} onClick={handleLogout}>
+          <Link href='login' passHref>
+            <span>
+              <LogoutVariant sx={{ marginRight: 2, fontSize: '1.375rem', color: 'text.secondary' }} />
+              Logout
+            </span>
+          </Link>
         </MenuItem>
       </Menu>
     </Fragment>

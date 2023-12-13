@@ -10,12 +10,12 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Typography from '@mui/material/Typography'
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
@@ -27,6 +27,8 @@ const ButtonStyled = styled(Button)(({ theme }) => ({
 const StoreSetting = () => {
   const userData = useUser()
   const [isLoading, setLoading] = useState(false)
+
+  // const [userStatus, setUserStatus] = useState('')
 
   // ** State
   const storeName = userData?.user_metadata?.store_name
@@ -64,6 +66,11 @@ const StoreSetting = () => {
       if (error) {
         console.log(error)
       }
+
+      //   console.log('data:', data)
+      //  const userStatus = data?.user_metadata?.storage
+      //   console.log('userdata:', userStatus)
+      //   setUserStatus(userStatus)
     } catch (error) {
       console.error('Error handling user update:', error.message)
     }
@@ -90,8 +97,8 @@ const StoreSetting = () => {
           <Grid item xs={12}>
             <LoadingButton
               onClick={handleStorage}
-              loading={isLoading}
-              disabled={userStatus}
+              loading={Boolean(isLoading)}
+              disabled={Boolean(userStatus)}
               variant='outlined'
               sx={{ marginRight: 3.5 }}
             >

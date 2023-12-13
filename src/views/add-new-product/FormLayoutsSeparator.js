@@ -24,12 +24,12 @@ import Link from 'next/link'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined'
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
@@ -154,7 +154,7 @@ const FormLayoutsSeparator = () => {
       return url3
     } catch (error) {
       console.error('An unexpected error occurred:', error.message)
-     
+
       return null // Return null or handle error as needed
     }
   }
@@ -196,7 +196,6 @@ const FormLayoutsSeparator = () => {
     } catch (error) {
       console.error('Unexpected error during upload:', error.message)
     } finally {
-     
     }
   }
 
@@ -217,13 +216,13 @@ const FormLayoutsSeparator = () => {
       // Return null or handle error as needed
       return null
     } finally {
-       // Reset success and failure after a delay
+      // Reset success and failure after a delay
       setTimeout(() => {
         setSuccess('')
       }, 9000)
 
-       clearForm();
-      
+     // clearForm()
+
       setFormDisabled(false)
       setLoading(false)
     }
@@ -237,6 +236,9 @@ const FormLayoutsSeparator = () => {
     setProductTag('')
     setSellingPrice('')
     setProductStock('')
+    setImageUrl1('')
+    setImageUrl2('')
+    setImageUrl3('')
   }
 
   if (!userData) {

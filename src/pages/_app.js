@@ -29,7 +29,6 @@ import '../../styles/globals.css'
 import { UserProvider, useUser } from 'src/@core/context/userDataContext'
 import { useEffect } from 'react'
 
-import Cookies from 'js-cookie';
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -60,16 +59,6 @@ const App = props => {
 
   // Variables
   const getLayout = Component.getLayout ?? (page => <UserLayout>{page}</UserLayout>)
-
-// Check if there is no access token in the cookie
-  useEffect(() => {
-    const accessToken = Cookies.get('access_token');
-
-    if (!accessToken) {
-      // Redirect to login page
-      router.push('/login');
-    }
-  }, []);
 
   return (
     <CacheProvider value={emotionCache}>
