@@ -96,7 +96,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-        setSuccess('Image 1 uploaded successfully!')
+        // setSuccess('Image 1 uploaded successfully!')
       }
 
       const url1 = data.fullPath
@@ -121,7 +121,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-        setSuccess('Image 2 uploaded successfully!')
+        // setSuccess('Image 2 uploaded successfully!')
       }
 
       const url2 = data.fullPath
@@ -146,7 +146,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-        setSuccess('Image 3 uploaded successfully!')
+      //  setSuccess('Image 3 uploaded successfully!')
       }
 
       const url3 = data.fullPath
