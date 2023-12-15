@@ -440,7 +440,7 @@ const FormLayoutsSeparator = () => {
               <TextField
                 fullWidth
                 label='Selling Price'
-                placeholder='Input Product Size'
+                placeholder='50000'
                 id='sellingPrice'
                 name='sellingPrice'
                 type='number'
@@ -453,7 +453,7 @@ const FormLayoutsSeparator = () => {
               <TextField
                 fullWidth
                 label='Product Size'
-                placeholder='Input Product Size'
+                placeholder='45'
                 id='productSize'
                 name='productSize'
                 type='number'
