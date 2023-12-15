@@ -1,8 +1,7 @@
-"use client"
-
-// Create a context with a default value of null
 import { createContext, useContext, useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/router'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -10,9 +9,6 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 const UserContext = createContext(null)
-
-import Cookies from 'js-cookie'
-import { useRouter } from 'next/router'
 
 // Custom hook to use the context
 export const useUser = () => {
@@ -24,47 +20,47 @@ export const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState(null)
   const router = useRouter()
 
-  const fetchUserData = async () => {
+  // Subscribe to auth state changes
+  const authListener = supabase.auth.onAuthStateChange((event, session) => {
+    const userData = session.user
+    if (event == 'USER_UPDATED') {
+      setUserData(userData)
+    } else if (event == 'TOKEN_REFRESHED') {
+      const userData = session.user
+      setUserData(userData)
+    } else if (event == 'SIGNED_IN') { 
+      setUserData(userData)
+    }
+  })
+  
+  const session = async () => {
     try {
-      const { data } = await supabase.auth.getUser()
-      if (data) {
-        setUserData(data.user)
+      const { data, error } = await supabase.auth.getSession()
+      if (error) { 
+        console.log(error.message);
+      }
+      if (data.session === null) { 
+        router.push('/login')
       }
     } catch (error) {
-      console.error('Error fetching user data:', error.message)
+      console.log(error.message)
     }
+    session()
   }
 
- useEffect(() => {
-  // Fetch data on component mount
-  fetchUserData();
-
-  // Check if running on the client side
-  if (typeof window !== 'undefined') {
-    // Subscribe to auth state changes
-    const authListener = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        const userData = session.user;
-        setUserData(userData);
-
-        // Set the access token to cookies
-        Cookies.set('access_token', session.access_token);
-
-        // Fetch data when the user is signed in
-        fetchUserData();
-      } else if (event === 'SIGNED_OUT') {
-        // Remove the access token from cookies
-        Cookies.remove('access_token');
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data } = await supabase.auth.getUser()
+        if (data) {
+          setUserData(data.user)
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error.message)
       }
-    });
+    }
+    fetchUserData()
+  }, []) // Add an empty dependency array
 
-    return () => {
-      // No need for explicit unsubscribe
-    };
-
-    // Ensure the cleanup function is only run on the client side
-  }
-}); // Add an empty dependency array
-  
   return <UserContext.Provider value={userData}>{children}</UserContext.Provider>
 }

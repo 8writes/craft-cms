@@ -141,13 +141,6 @@ const RegisterPage = () => {
       setLoading(false)
     }
   }
-
-  
-   if (userData) {
-     router.push('/dashboard')
-     
-     return null
-   }
   
   return (
     <Box className='content-center relative'>

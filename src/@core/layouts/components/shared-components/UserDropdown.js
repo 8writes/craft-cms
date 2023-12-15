@@ -46,7 +46,8 @@ const UserDropdown = () => {
     setAnchorEl(event.currentTarget)
   }
 
-  const handleDropdownClose = () => {
+  const handleDropdownClose = (url) => {
+    router.push(url)
     setAnchorEl(null)
   }
 
@@ -132,12 +133,10 @@ const UserDropdown = () => {
         <Divider />
 
         <MenuItem sx={{ py: 2 }} onClick={handleLogout}>
-          <Link href='login' passHref>
             <span>
               <LogoutVariant sx={{ marginRight: 2, fontSize: '1.375rem', color: 'text.secondary' }} />
               Logout
             </span>
-          </Link>
         </MenuItem>
       </Menu>
     </Fragment>

@@ -6,7 +6,6 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import CardContent from '@mui/material/CardContent'
 import { styled } from '@mui/material/styles'
-import LoadingButton from '@mui/lab/LoadingButton'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Typography from '@mui/material/Typography'
@@ -26,18 +25,18 @@ const ButtonStyled = styled(Button)(({ theme }) => ({
 
 const StoreSetting = () => {
   const userData = useUser()
-  const [isLoading, setLoading] = useState(false)
-
-  // const [userStatus, setUserStatus] = useState('')
+  const [success, setSuccess] = useState('')
+  const [failed, setFailed] = useState('')
 
   // ** State
+
+  const userEmail = userData?.email
   const storeName = userData?.user_metadata?.store_name
   const userId = userData?.id
-  const userEmail = userData?.email
   const userStatus = userData?.user_metadata?.storage
 
-  const handleStorage = async () => {
-    setLoading(true)
+  
+ const handleStorage = async () => {
     try {
       const { data, error } = await supabase.storage.createBucket(`${storeName}`, {
         public: true,
@@ -47,16 +46,21 @@ const StoreSetting = () => {
       })
 
       if (error) {
-        console.log(error)
+        setFailed(error.message)
       } else {
         handleUserUpdate()
+        setSuccess('Account activated Successfully!')
       }
     } catch (error) {
       console.error('Error handling storage:', error.message)
     } finally {
-      setLoading(false)
+      
+      setTimeout(() => {
+        setSuccess('')
+      }, 9000)
     }
-  }
+ }
+  
 
   const handleUserUpdate = async () => {
     try {
@@ -64,13 +68,8 @@ const StoreSetting = () => {
         data: { storage: true }
       })
       if (error) {
-        console.log(error)
+       setFailed(error.message)
       }
-
-      //   console.log('data:', data)
-      //  const userStatus = data?.user_metadata?.storage
-      //   console.log('userdata:', userStatus)
-      //   setUserStatus(userStatus)
     } catch (error) {
       console.error('Error handling user update:', error.message)
     }
@@ -89,27 +88,42 @@ const StoreSetting = () => {
 
   return (
     <CardContent>
+       {success && (
+        <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
+          <Alert variant='filled' severity='success' sx={{ '& a': { fontWeight: 500 } }}>
+            <AlertTitle>{success}</AlertTitle>
+          </Alert>
+        </Grid>
+      )}
+      {failed && (
+        <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
+          <Alert variant='filled' severity='error' sx={{ '& a': { fontWeight: 500 } }}>
+            <AlertTitle>
+              {failed}
+              <span className=' cursor-pointer px-2' onClick={() => setFailed('')}>
+                &#128473;
+              </span>
+            </AlertTitle>
+          </Alert>
+        </Grid>
+      )}
       <form>
         <Grid container spacing={7} sx={{ marginTop: 1 }}>
           <Grid item xs={12} sm={6}>
             <TextField fullWidth label='Store Name' defaultValue={storeName ? storeName.toUpperCase() : ''} disabled />
           </Grid>
-          <Grid item xs={12}>
-            <LoadingButton
-              onClick={handleStorage}
-              loading={Boolean(isLoading)}
-              disabled={Boolean(userStatus)}
-              variant='outlined'
-              sx={{ marginRight: 3.5 }}
-            >
-              Initialize Store
-            </LoadingButton>
+          {userStatus ? (<Grid item xs={12} sx={{ mt: 5 }}>
+              <Alert severity='success' sx={{ '& a': { fontWeight: 400 } }}>
+                <AlertTitle>Your store is activated!</AlertTitle>
+              </Alert>
+            </Grid>): (
+            
             <Grid item xs={12} sx={{ mt: 5 }}>
               <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
-                <AlertTitle>Initialize your store and contact support to activate.</AlertTitle>
+                <AlertTitle>Kindly activate your store <span className='cursor-pointer underline' onClick={handleStorage}>Here</span></AlertTitle>
               </Alert>
             </Grid>
-          </Grid>
+          )}
         </Grid>
       </form>
     </CardContent>

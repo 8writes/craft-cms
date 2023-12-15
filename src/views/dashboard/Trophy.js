@@ -6,6 +6,15 @@ import CardContent from '@mui/material/CardContent'
 import { styled, useTheme } from '@mui/material/styles'
 import Link from 'next/link'
 import { useUser } from 'src/@core/context/userDataContext'
+import LoadingButton from '@mui/lab/LoadingButton'
+import { useState } from 'react'
+import { Alert, AlertTitle, Grid } from '@mui/material'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Styled component for the triangle shaped background image
 const TriangleImg = styled('img')({
@@ -17,25 +26,88 @@ const TriangleImg = styled('img')({
 
 const Trophy = () => {
   const userData = useUser()
+  const [isLoading, setLoading] = useState(false)
+  const [success, setSuccess] = useState('')
+  const [failed, setFailed] = useState('')
+
 
   const userEmail = userData?.email
   const userFirstName = userData?.user_metadata?.first_name
-
-  //  const userLastName = userData?.user_metadata?.last_name
-
+  const storeName = userData?.user_metadata?.store_name
+  const userId = userData?.id
   const userStatus = userData?.user_metadata?.storage
 
   // ** Hook
   const theme = useTheme()
   const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
 
+ const handleStorage = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase.storage.createBucket(`${storeName}`, {
+        public: true,
+        user_id: userId,
+        email: userEmail,
+        fileSizeLimit: 1024 * 1024
+      })
+
+      if (error) {
+        setFailed(error.message)
+      } else {
+        handleUserUpdate()
+        setSuccess('Account activated Successfully!')
+      }
+    } catch (error) {
+      console.error('Error handling storage:', error.message)
+    } finally {
+      setLoading(false)
+      
+      setTimeout(() => {
+        setSuccess('')
+      }, 9000)
+    }
+ }
+  
+
+  const handleUserUpdate = async () => {
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        data: { storage: true }
+      })
+      if (error) {
+       setFailed(error.message)
+      }
+    } catch (error) {
+      console.error('Error handling user update:', error.message)
+    }
+  }
+
   return (
     <Card sx={{ position: 'relative' }}>
+      {success && (
+        <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
+          <Alert variant='filled' severity='success' sx={{ '& a': { fontWeight: 500 } }}>
+            <AlertTitle>{success}</AlertTitle>
+          </Alert>
+        </Grid>
+      )}
+      {failed && (
+        <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
+          <Alert variant='filled' severity='error' sx={{ '& a': { fontWeight: 500 } }}>
+            <AlertTitle>
+              {failed}
+              <span className=' cursor-pointer px-2' onClick={() => setFailed('')}>
+                &#128473;
+              </span>
+            </AlertTitle>
+          </Alert>
+        </Grid>
+      )}
       <CardContent>
-        <Typography variant='h5'>Welcome to your dashboard</Typography>
+        <Typography variant='h5'>Welcome {userFirstName}</Typography>
         {userData ? (
           <>
-            <Typography variant='h6'>{userFirstName}🤠</Typography>
+            <Typography variant='h6'></Typography>
             <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>
               {userEmail}
             </Typography>
@@ -43,14 +115,14 @@ const Trophy = () => {
         ) : (
           <>
             <Typography variant='h6' sx={{ letterSpacing: '0.25px' }}>
-              Loading...&#127744;
+              Loading...
             </Typography>
           </>
         )}
         {userStatus ? (
           <>
              <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
-              Your store is Activated
+              Your store is Activated &#127881;
             </Typography>
             <Link href='/add-new-product' passHref>
               <Button size='medium' variant='outlined'>
@@ -61,13 +133,18 @@ const Trophy = () => {
         ) : (
           <>
             <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
-              Ready to activate your store?
+              Kindly activate your account
             </Typography>
-            <Link href='/account-settings' passHref>
-              <Button size='medium' variant='contained'>
-                Store Setting
-              </Button>
-            </Link>
+            
+             <LoadingButton
+              onClick={handleStorage}
+              loading={Boolean(isLoading)}
+              variant='contained'
+              sx={{ marginRight: 3.5 }}
+            >
+              Activate account
+            </LoadingButton>
+           
           </>
         )}
 

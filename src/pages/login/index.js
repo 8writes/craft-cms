@@ -102,12 +102,6 @@ const LoginPage = () => {
     }
   }
 
-   if (userData) {
-     router.push('/dashboard')
-     
-     return null
-  }
-
   return (
     <Box className='content-center'>
       {success && (

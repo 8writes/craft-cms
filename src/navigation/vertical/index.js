@@ -3,8 +3,12 @@ import HomeOutline from 'mdi-material-ui/HomeOutline'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import CogOutline from 'mdi-material-ui/CogOutline'
 import InformationOutline from 'mdi-material-ui/InformationOutline'
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/router'
 
 const navigation = () => {
+  
+
   return [
     {
       title: 'Dashboard',

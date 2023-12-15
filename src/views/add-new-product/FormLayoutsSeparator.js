@@ -76,13 +76,9 @@ const FormLayoutsSeparator = () => {
   const isDisabled =
     !productName ||
     !productDescription ||
-    !productSize ||
-    !productTag ||
     !productStock ||
     !sellingPrice ||
-    !imageUrl1 ||
-    !imageUrl2 ||
-    !imageUrl3
+    !imageUrl1 
 
   const uploadImage1 = async () => {
     try {
@@ -96,7 +92,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-        // setSuccess('Image 1 uploaded successfully!')
+        setSuccess('Image 1 uploaded successfully!')
       }
 
       const url1 = data.fullPath
@@ -121,7 +117,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-        // setSuccess('Image 2 uploaded successfully!')
+        setSuccess('Image 2 uploaded successfully!')
       }
 
       const url2 = data.fullPath
@@ -146,7 +142,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-      //  setSuccess('Image 3 uploaded successfully!')
+        setSuccess('Image 3 uploaded successfully!')
       }
 
       const url3 = data.fullPath
@@ -221,7 +217,7 @@ const FormLayoutsSeparator = () => {
         setSuccess('')
       }, 9000)
 
-       clearForm()
+     // clearForm()
 
       setFormDisabled(false)
       setLoading(false)
@@ -427,7 +423,7 @@ const FormLayoutsSeparator = () => {
               <TextField
                 fullWidth
                 label='Product Description'
-                placeholder='Input Product Description'
+                placeholder='Input Product Description/Details'
                 id='productDescription'
                 name='productDescription'
                 type='text'
@@ -475,10 +471,9 @@ const FormLayoutsSeparator = () => {
                   value={productTag}
                   onChange={e => setProductTag(e.target.value)}
                 >
-                  <MenuItem value='men'>Mens Shoe</MenuItem>
-                  <MenuItem value='women'>Women Shoe</MenuItem>
-                  <MenuItem value='maleKid'>Male Kids Shoe</MenuItem>
-                  <MenuItem value='femaleKid'>Female Kids Shoe</MenuItem>
+                  <MenuItem value='men'>Men</MenuItem>
+                  <MenuItem value='women'>Women</MenuItem>
+                  <MenuItem value='kids'>Kids</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

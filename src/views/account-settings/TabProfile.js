@@ -76,10 +76,10 @@ const TabProfile = () => {
           ) : null}
         </Grid>
         <Grid item xs={12}>
-          <LoadingButton disabled variant='outlined' sx={{ marginRight: 3.5 }}>
+          {/**<LoadingButton disabled variant='outlined' sx={{ marginRight: 3.5 }}>
             Update Changes
           </LoadingButton>
-          {/** <Button type='reset' variant='outlined' color='error'>
+           <Button type='reset' variant='outlined' color='error'>
               Deactivate Store
             </Button> */}
           <Grid item xs={12} sx={{ mt: 5 }}>

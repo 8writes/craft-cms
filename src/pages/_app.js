@@ -1,6 +1,8 @@
 // ** Next Imports
 import Head from 'next/head'
-import { Router, useRouter } from 'next/router'
+import { Router } from 'next/router'
+
+import { useRouter } from 'next/router'
 
 // ** Loader Import
 import NProgress from 'nprogress'
@@ -28,7 +30,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css'
 import '../../styles/globals.css'
 import { UserProvider, useUser } from 'src/@core/context/userDataContext'
 import { useEffect } from 'react'
-
+import Cookies from 'js-cookie'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -47,13 +49,6 @@ if (themeConfig.routingLoader) {
 
 // ** Configure JSS & ClassName
 const App = props => {
-  const router = useRouter()
-
-  const userData = useUser()
-
-  console.log(userData)
-
-  // const [userId, setUserId] = useState('')
 
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
