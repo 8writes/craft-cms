@@ -22,11 +22,11 @@ export const UserProvider = ({ children }) => {
 
   // Subscribe to auth state changes
   const authListener = supabase.auth.onAuthStateChange((event, session) => {
-    const userData = session.user
+    const userData = session?.user
     if (event == 'USER_UPDATED') {
       setUserData(userData)
     } else if (event == 'TOKEN_REFRESHED') {
-      const userData = session.user
+      const userData = session?.user
       setUserData(userData)
     } else if (event == 'SIGNED_IN') { 
       setUserData(userData)
@@ -53,7 +53,7 @@ export const UserProvider = ({ children }) => {
       try {
         const { data } = await supabase.auth.getUser()
         if (data) {
-          setUserData(data.user)
+          setUserData(data?.user)
         }
       } catch (error) {
         console.error('Error fetching user data:', error.message)
