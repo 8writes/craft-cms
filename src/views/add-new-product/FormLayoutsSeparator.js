@@ -440,6 +440,8 @@ const FormLayoutsSeparator = () => {
                 id='sellingPrice'
                 name='sellingPrice'
                 type='number'
+                pattern="[0-9]*"
+                inputMode="numeric"
                 disabled={formDisabled}
                 value={sellingPrice}
                 onChange={e => setSellingPrice(e.target.value)}
@@ -453,6 +455,8 @@ const FormLayoutsSeparator = () => {
                 id='productSize'
                 name='productSize'
                 type='number'
+                                pattern="[0-9]*"
+                inputMode="numeric"
                 disabled={formDisabled}
                 value={productSize}
                 onChange={e => setProductSize(e.target.value)}
