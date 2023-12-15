@@ -22,45 +22,42 @@ export const UserProvider = ({ children }) => {
 
   // Subscribe to auth state changes
   const authListener = supabase.auth.onAuthStateChange((event, session) => {
-    const userData = session?.user
-    if (event == 'USER_UPDATED') {
-      setUserData(userData)
-    } else if (event == 'TOKEN_REFRESHED') {
-      const userData = session?.user
-      setUserData(userData)
-    } else if (event == 'SIGNED_IN') { 
-      setUserData(userData)
+    if (event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
+      setUserData(session.user)
     }
   })
-  
-  const session = async () => {
-    try {
-      const { data, error } = await supabase.auth.getSession()
-      if (error) { 
-        console.log(error.message);
+
+  useEffect(() => {
+    const session = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession()
+        if (error) {
+          console.log(error.message)
+        }
+        if (data.session === null) {
+          router.push('/login')
+          console.log(data)
+        }
+      } catch (error) {
+        console.log(error.message)
       }
-      if (data.session === null) { 
-        router.push('/login')
-      }
-    } catch (error) {
-      console.log(error.message)
     }
     session()
-  }
+  }, []) // Add router to the dependency array
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const { data } = await supabase.auth.getUser()
         if (data) {
-          setUserData(data?.user)
+          setUserData(data.user)
         }
       } catch (error) {
         console.error('Error fetching user data:', error.message)
       }
     }
     fetchUserData()
-  }, []) // Add an empty dependency array
+  }, []) // Empty dependency array
 
   return <UserContext.Provider value={userData}>{children}</UserContext.Provider>
 }

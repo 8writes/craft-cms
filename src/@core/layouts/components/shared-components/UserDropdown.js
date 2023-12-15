@@ -47,7 +47,9 @@ const UserDropdown = () => {
   }
 
   const handleDropdownClose = (url) => {
-    router.push(url)
+    if (url) {
+      router.push(url)
+    }
     setAnchorEl(null)
   }
 
