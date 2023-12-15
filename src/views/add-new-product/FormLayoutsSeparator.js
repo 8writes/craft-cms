@@ -440,7 +440,7 @@ const FormLayoutsSeparator = () => {
                 id='sellingPrice'
                 name='sellingPrice'
                 type='number'
-                pattern="[0-9]*"
+                pattern="\d*"
                 inputMode="numeric"
                 disabled={formDisabled}
                 value={sellingPrice}
@@ -455,7 +455,7 @@ const FormLayoutsSeparator = () => {
                 id='productSize'
                 name='productSize'
                 type='number'
-                                pattern="[0-9]*"
+                                pattern="[\d*]*"
                 inputMode="numeric"
                 disabled={formDisabled}
                 value={productSize}
