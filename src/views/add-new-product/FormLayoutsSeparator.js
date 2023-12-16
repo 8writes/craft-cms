@@ -187,6 +187,9 @@ const FormLayoutsSeparator = () => {
       const currentDate = new Date()
       const date = currentDate.toISOString().split('T')[0]
 
+      // Filter out empty sizes
+      const sizes = productSizes.filter(size => size.trim() !== '');
+      
       // Prepare an array to store individual data objects
       const formDataArray = [
         {
@@ -195,7 +198,7 @@ const FormLayoutsSeparator = () => {
           name: productName,
           description: productDescription,
           price: sellingPrice,
-          size: productSizes,
+          size: sizes,
           tag: productTag,
           email: emailAddress,
           stock: productStock,
@@ -319,7 +322,7 @@ const FormLayoutsSeparator = () => {
                     <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                     <input
                       hidden
-                      disabled={imageUrl1}
+                      disabled={imageUrl1 || formDisabled}
                       type='file'
                       onChange={e => {
                         const file = e.target.files[0]
@@ -354,7 +357,7 @@ const FormLayoutsSeparator = () => {
                     <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                     <input
                       hidden
-                      disabled={imageUrl2}
+                        disabled={imageUrl2 || formDisabled}
                       type='file'
                       onChange={e => {
                         const file = e.target.files[0]
@@ -390,7 +393,7 @@ const FormLayoutsSeparator = () => {
                       <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                       <input
                         hidden
-                        disabled={imageUrl3}
+                          disabled={imageUrl3 || formDisabled}
                         type='file'
                         onChange={e => {
                           const file = e.target.files[0]
@@ -522,6 +525,7 @@ const FormLayoutsSeparator = () => {
               label={`Product Size`}
               placeholder={`e.g., 36/XL`}
               value={size}
+              disabled={formDisabled}
               onChange={(e) => handleSizeChange(index, e.target.value)}
             />
             <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => handleRemoveSize(index)}/>
