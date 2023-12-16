@@ -104,7 +104,7 @@ const Trophy = () => {
         </Grid>
       )}
       <CardContent>
-        <Typography variant='h5'>Welcome {userFirstName}</Typography>
+        <Typography variant='h5'>Welcome, {userFirstName}</Typography>
         {userData ? (
           <>
             <Typography variant='h6'></Typography>

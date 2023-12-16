@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import { v4 as uuidv4 } from 'uuid'
 import Box from '@mui/material/Box'
@@ -23,6 +23,8 @@ import { useUser } from 'src/@core/context/userDataContext'
 import Link from 'next/link'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined'
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 
 import { createClient } from '@supabase/supabase-js'
 
@@ -45,7 +47,6 @@ const FormLayoutsSeparator = () => {
   const [productName, setProductName] = useState('')
   const [productDescription, setProductDescription] = useState('')
   const [sellingPrice, setSellingPrice] = useState('')
-  const [productSize, setProductSize] = useState('')
   const [productTag, setProductTag] = useState('')
   const [productStock, setProductStock] = useState('')
   const [imageUrl1, setImageUrl1] = useState('')
@@ -56,6 +57,36 @@ const FormLayoutsSeparator = () => {
   const [failed, setFailed] = useState('')
   const [userId, setUserId] = useState('')
   const [formDisabled, setFormDisabled] = useState(false)
+
+  const [productSizes, setProductSizes] = useState([''])
+
+  const isMounted = useRef(true); 
+
+ // Function to handle size change
+  const handleSizeChange = (index, value) => {
+    const newSizes = [...productSizes];
+    newSizes[index] = value;
+    setProductSizes(newSizes);
+  };
+
+  // Function to handle removing a size
+  const handleRemoveSize = (index) => {
+    const newSizes = [...productSizes];
+    newSizes.splice(index, 1);
+    setProductSizes(newSizes);
+  };
+
+  // Function to handle adding a new size
+  const handleAddSize = () => {
+    // Check if the number of sizes is less than 8 before adding a new size
+    if (productSizes.length < 8) {
+      setProductSizes([...productSizes, '']); // Add an empty size
+    } else {
+      // You can show a message or take any other action if the limit is reached
+      setFailed('maximum number of sizes exceeded');
+    }
+  };
+
 
   useEffect(() => {
     const getUser = async () => {
@@ -73,12 +104,7 @@ const FormLayoutsSeparator = () => {
   const emailAddress = userData?.email
   const storeName = userData?.user_metadata?.store_name
 
-  const isDisabled =
-    !productName ||
-    !productDescription ||
-    !productStock ||
-    !sellingPrice ||
-    !imageUrl1 
+  const isDisabled = !productName || !productDescription || !productStock || !sellingPrice || !imageUrl1
 
   const uploadImage1 = async () => {
     try {
@@ -92,7 +118,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-        setSuccess('Image 1 uploaded successfully!')
+     //   setSuccess('Image 1 uploaded successfully!')
       }
 
       const url1 = data.fullPath
@@ -117,7 +143,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-        setSuccess('Image 2 uploaded successfully!')
+      //  setSuccess('Image 2 uploaded successfully!')
       }
 
       const url2 = data.fullPath
@@ -142,7 +168,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-        setSuccess('Image 3 uploaded successfully!')
+      //  setSuccess('Image 3 uploaded successfully!')
       }
 
       const url3 = data.fullPath
@@ -169,7 +195,7 @@ const FormLayoutsSeparator = () => {
           name: productName,
           description: productDescription,
           price: sellingPrice,
-          size: productSize,
+          size: productSizes,
           tag: productTag,
           email: emailAddress,
           stock: productStock,
@@ -210,14 +236,14 @@ const FormLayoutsSeparator = () => {
       console.error('An unexpected error occurred:', error.message)
 
       // Return null or handle error as needed
-      return null
+       isMounted.current = false;
     } finally {
       // Reset success and failure after a delay
       setTimeout(() => {
         setSuccess('')
       }, 9000)
 
-     // clearForm()
+       clearForm()
 
       setFormDisabled(false)
       setLoading(false)
@@ -228,13 +254,13 @@ const FormLayoutsSeparator = () => {
   const clearForm = () => {
     setProductName('')
     setProductDescription('')
-    setProductSize('')
     setProductTag('')
     setSellingPrice('')
     setProductStock('')
     setImageUrl1('')
     setImageUrl2('')
     setImageUrl3('')
+    setProductSizes([''])
   }
 
   if (!userData) {
@@ -436,30 +462,15 @@ const FormLayoutsSeparator = () => {
               <TextField
                 fullWidth
                 label='Selling Price'
-                placeholder='50000'
+                placeholder='e.g., 50000'
                 id='sellingPrice'
                 name='sellingPrice'
                 type='number'
-                pattern="\d*"
-                inputMode="numeric"
+                pattern='\d*'
+                inputMode='numeric'
                 disabled={formDisabled}
                 value={sellingPrice}
                 onChange={e => setSellingPrice(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label='Product Size'
-                placeholder='45'
-                id='productSize'
-                name='productSize'
-                type='number'
-                                pattern="[\d*]*"
-                inputMode="numeric"
-                disabled={formDisabled}
-                value={productSize}
-                onChange={e => setProductSize(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -475,9 +486,14 @@ const FormLayoutsSeparator = () => {
                   value={productTag}
                   onChange={e => setProductTag(e.target.value)}
                 >
-                  <MenuItem value='men'>Men</MenuItem>
-                  <MenuItem value='women'>Women</MenuItem>
-                  <MenuItem value='kids'>Kids</MenuItem>
+                  <MenuItem value=''>None</MenuItem>
+                  <MenuItem value='shoe'>Shoe</MenuItem>
+                  <MenuItem value='bag'>Bag</MenuItem>
+                  <MenuItem value='phone'>Phone</MenuItem>
+                  <MenuItem value='laptop'>Laptop</MenuItem>
+                  <MenuItem value='kids'>Kids Wear</MenuItem>
+                  <MenuItem value='adultMen'>Adults Wear (Men)</MenuItem>
+                  <MenuItem value='adultWomen'>Adults Wear (Women)</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -500,6 +516,26 @@ const FormLayoutsSeparator = () => {
                 </Select>
               </FormControl>
             </Grid>
+             <Grid container item xs={12} sm={6}>
+        {productSizes.map((size, index) => (
+          <div className='flex items-center my-1' key={index}>
+            <TextField
+              fullWidth
+              label={`Product Size`}
+              placeholder={`e.g., 36/XL`}
+              value={size}
+              onChange={(e) => handleSizeChange(index, e.target.value)}
+            />
+            <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => handleRemoveSize(index)}/>
+          </div>
+        ))}
+              <div className='flex items-center my-2' >
+                <Button onClick={handleAddSize} variant='outlined' size='small'>
+                  <AddRoundedIcon />
+                  new size
+                </Button>
+        </div>
+      </Grid>
           </Grid>
         </CardContent>
         <Divider sx={{ margin: 0 }} />

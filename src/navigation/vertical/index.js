@@ -42,7 +42,7 @@ const navigation = () => {
     {
       title: 'Support',
       icon: InformationOutline,
-      path: '#'
+      path: '#',
     }
   ]
 }

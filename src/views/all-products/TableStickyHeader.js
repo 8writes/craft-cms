@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 
 // ** MUI Imports
 import Paper from '@mui/material/Paper'
@@ -18,12 +18,12 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import IntroHeading from './IntroHeading'
 import { Alert, AlertTitle, Typography } from '@mui/material'
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 let idCounter = 0
 
@@ -31,7 +31,7 @@ const columns = [
   { id: 'sn', label: 'S/N' },
   { id: 'image', label: 'Preview' },
   { id: 'name', label: 'Product Name' },
-  { id: 'size', label: 'Size' },
+  { id: 'size', label: 'Size'},
   {
     id: 'date',
     label: 'Date'
@@ -42,13 +42,14 @@ const columns = [
     format: value => value.toLocaleString('en-US')
   },
   { id: 'stock', label: 'Inventory' },
-   { id: 'action', label: '' }
+  { id: 'action', label: '' }
 ]
 
 const TableStickyHeader = () => {
   const userData = useUser()
   const [success, setSuccess] = useState('')
   const [failed, setFailed] = useState('')
+  const [suspense, setSuspense] = useState('')
 
   // ** States
   const [page, setPage] = useState(0)
@@ -77,6 +78,7 @@ const TableStickyHeader = () => {
   const storeName = userData?.user_metadata?.store_name
 
   const fetchData = async () => {
+    setSuspense('Loading products data...')
     try {
       const { data, error } = await supabase.from(`${storeName}`).select()
 
@@ -97,62 +99,60 @@ const TableStickyHeader = () => {
       setTableData(formattedData)
     } catch (error) {
       console.error('Error fetching data:', error.message)
+    } finally {
+      setSuspense('')
     }
   }
 
-  const deleteImage = async (id) => {
-  try {
-    // Get all image URLs from the data based on the id
-    const imageUrls = [
-      tableData.find(item => item.id === id)?.uploadedImageUrl1,
-      tableData.find(item => item.id === id)?.uploadedImageUrl2,
-        tableData.find(item => item.id === id)?.uploadedImageUrl3,
-    ].filter(Boolean);
+  const deleteImage = async id => {
+    try {
+      // Get all image URLs from the data based on the id
+      const imageUrls = [
+        tableData.find(item => item.id === id)?.uploadedImageUrl1,
+        tableData.find(item => item.id === id)?.uploadedImageUrl2,
+        tableData.find(item => item.id === id)?.uploadedImageUrl3
+      ].filter(Boolean)
 
-    // Remove the first segment from each image URL
-    const modifiedUrls = imageUrls.map(url => {
-      const segments = url.split('/');
-      segments.shift(); // Remove the first segment
+      // Remove the first segment from each image URL
+      const modifiedUrls = imageUrls.map(url => {
+        const segments = url.split('/')
+        segments.shift() // Remove the first segment
 
-      return segments.join('/');
-    });
+        return segments.join('/')
+      })
 
-    // Remove images from Supabase storage using prefixes
-    const { data, error } = await supabase.storage.from(`${storeName}`).remove(modifiedUrls);
+      // Remove images from Supabase storage using prefixes
+      const { data, error } = await supabase.storage.from(`${storeName}`).remove(modifiedUrls)
 
-    if (error) {
-      console.log('send error to support:', error.message);
-    } 
-  } catch (error) {
-    console.error('Error deleting images:', error.message);
+      if (error) {
+        console.log('send error to support:', error.message)
+      }
+    } catch (error) {
+      console.error('Error deleting images:', error.message)
+    }
   }
-};
 
   const handleDelete = async id => {
+    await deleteImage(id)
 
-    await deleteImage(id);
-    
     try {
-
       const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id)
 
       if (error) {
-        setFailed(error.message);
+        setFailed(error.message)
       } else {
         setSuccess('Product deleted successfully!')
       }
-      
+
       await fetchData()
     } catch (error) {
       console.error('Error deleting data:', error.message)
-
-    } finally { 
-       // Reset success and failure after a delay
+    } finally {
+      // Reset success and failure after a delay
       setTimeout(() => {
         setSuccess('')
       }, 3000)
     }
-
   }
 
   const handleChangePage = (event, newPage) => {
@@ -164,20 +164,10 @@ const TableStickyHeader = () => {
     setPage(0)
   }
 
-  if (!userData) {
-   return (
-      <div className='grid justify-center h-96 p-10'>
-        <Typography variant='h4' sx={{ my: 4, color: 'primary.main' }} className='animate-spin'>
-          &#128640;
-        </Typography>
-        <Typography variant='h6'>Loading data ...</Typography>
-      </div>
-    )
-  }
 
-  return (
+ return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        {success && (
+    {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
           <Alert variant='filled' severity='success' sx={{ '& a': { fontWeight: 500 } }}>
             <AlertTitle>{success}</AlertTitle>
@@ -187,7 +177,12 @@ const TableStickyHeader = () => {
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
           <Alert variant='filled' severity='error' sx={{ '& a': { fontWeight: 500 } }}>
-            <AlertTitle>{failed}</AlertTitle>
+            <AlertTitle>
+              {failed}
+              <span className=' cursor-pointer px-2' onClick={() => setFailed('')}>
+                &#128473;
+              </span>
+            </AlertTitle>
           </Alert>
         </Grid>
       )}
@@ -198,49 +193,67 @@ const TableStickyHeader = () => {
         <Table stickyHeader aria-label='sticky table'>
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
+              {columns.map(column => (
                 <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
                   {column.label}
                 </TableCell>
               ))}
+              <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
               <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
-                {columns.map((column) => {
-                  const value = row[column.id];
-                  
-                  return (
-                    
-                    <TableCell key={column.id} align={column.align}>
-                      {column.id === 'image' ? (
-                        <img
-                          src={`https://hymcbwrcksuwhtfstztz.supabase.co/storage/v1/object/public/${value}`}
-                          alt={`Product ${row.sn} Image`}
-                          style={{ width: '60px', height: '50px', borderRadius: '5px' }}
-                        />
-                      ) : column.format && typeof value === 'number' ? (
-                        column.format(value)
-                      ) : (
-                        value
-                      )}
-                    </TableCell>
-                    
-                  );
-                })}
-                <TableCell sx={{display: 'grid', gap: '5px'}}>
+                {columns.map((column) => (
+                  <TableCell key={column.id} align={column.align}>
+                    {column.id === 'image' ? (
+                      <img
+                        src={`https://hymcbwrcksuwhtfstztz.supabase.co/storage/v1/object/public/${row[column.id]}`}
+                        alt={`Product ${row.sn} Image`}
+                        style={{ width: '60px', height: '50px', borderRadius: '5px' }}
+                      />
+                    ) : column.id === 'size' ? (
+                        
+                      // Map and join the size values with ","
+                      row[column.id].map((size, index) => (
+                        <span key={index}>
+                          {size}
+                          {index < row[column.id].length - 1 && ', '}
+                        </span>
+                      ))
+                    ) : column.format && typeof row[column.id] === 'number' ? (
+                      column.format(row[column.id])
+                    ) : (
+                      row[column.id]
+                    )}
+                  </TableCell>
+                ))}
+                <TableCell>
                   <LoadingButton size='small' variant='outlined' onClick={() => handleDelete(row.id)}>
                     Delete
-                  </LoadingButton>
-                  <LoadingButton size='small' variant='outlined'>
-                    Edit
                   </LoadingButton>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        {suspense ? (
+          <div className='text-center my-10'>
+            <Typography variant='h5' className='text-slate-100'>
+              {suspense}
+            </Typography>
+          </div>
+        ) : (
+          <>
+            {tableData.length === 0 && (
+              <div className='text-center my-10'>
+                <Typography variant='h4' className='text-slate-100'>
+                  No products yet.
+                </Typography>
+              </div>
+            )}
+          </>
+        )}
       </TableContainer>
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
