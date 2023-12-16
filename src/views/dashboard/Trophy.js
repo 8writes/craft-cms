@@ -94,12 +94,7 @@ const Trophy = () => {
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
           <Alert variant='filled' severity='error' sx={{ '& a': { fontWeight: 500 } }}>
-            <AlertTitle>
-              {failed}
-              <span className=' cursor-pointer px-2' onClick={() => setFailed('')}>
-                &#128473;
-              </span>
-            </AlertTitle>
+            <CloseRoundedIcon className=' cursor-pointer  mx-2' onClick={() => setFailed('')} />
           </Alert>
         </Grid>
       )}

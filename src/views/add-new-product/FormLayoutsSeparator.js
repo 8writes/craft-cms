@@ -288,9 +288,7 @@ const FormLayoutsSeparator = () => {
           <Alert variant='filled' severity='error' sx={{ '& a': { fontWeight: 500 } }}>
             <AlertTitle>
               {failed}
-              <span className=' cursor-pointer px-2' onClick={() => setFailed('')}>
-                &#128473;
-              </span>
+              <CloseRoundedIcon className=' cursor-pointer  mx-2' onClick={() => setFailed('')} />
             </AlertTitle>
           </Alert>
         </Grid>
