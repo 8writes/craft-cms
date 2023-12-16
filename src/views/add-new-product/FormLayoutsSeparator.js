@@ -60,33 +60,32 @@ const FormLayoutsSeparator = () => {
 
   const [productSizes, setProductSizes] = useState([''])
 
-  const isMounted = useRef(true); 
+  const isMounted = useRef(true)
 
- // Function to handle size change
+  // Function to handle size change
   const handleSizeChange = (index, value) => {
-    const newSizes = [...productSizes];
-    newSizes[index] = value;
-    setProductSizes(newSizes);
-  };
+    const newSizes = [...productSizes]
+    newSizes[index] = value
+    setProductSizes(newSizes)
+  }
 
   // Function to handle removing a size
-  const handleRemoveSize = (index) => {
-    const newSizes = [...productSizes];
-    newSizes.splice(index, 1);
-    setProductSizes(newSizes);
-  };
+  const handleRemoveSize = index => {
+    const newSizes = [...productSizes]
+    newSizes.splice(index, 1)
+    setProductSizes(newSizes)
+  }
 
   // Function to handle adding a new size
   const handleAddSize = () => {
     // Check if the number of sizes is less than 8 before adding a new size
     if (productSizes.length < 8) {
-      setProductSizes([...productSizes, '']); // Add an empty size
+      setProductSizes([...productSizes, '']) // Add an empty size
     } else {
       // You can show a message or take any other action if the limit is reached
-      setFailed('maximum number of sizes exceeded');
+      setFailed('maximum number of sizes exceeded')
     }
-  };
-
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -118,7 +117,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-     //   setSuccess('Image 1 uploaded successfully!')
+        //   setSuccess('Image 1 uploaded successfully!')
       }
 
       const url1 = data.fullPath
@@ -143,7 +142,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-      //  setSuccess('Image 2 uploaded successfully!')
+        //  setSuccess('Image 2 uploaded successfully!')
       }
 
       const url2 = data.fullPath
@@ -168,7 +167,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
-      //  setSuccess('Image 3 uploaded successfully!')
+        //  setSuccess('Image 3 uploaded successfully!')
       }
 
       const url3 = data.fullPath
@@ -188,8 +187,8 @@ const FormLayoutsSeparator = () => {
       const date = currentDate.toISOString().split('T')[0]
 
       // Filter out empty sizes
-      const sizes = productSizes.filter(size => size.trim() !== '');
-      
+      const sizes = productSizes.filter(size => size.trim() !== '')
+
       // Prepare an array to store individual data objects
       const formDataArray = [
         {
@@ -216,10 +215,11 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
+        setFailed('')
         setSuccess('Product Uploaded successfully!')
       }
     } catch (error) {
-      console.error('Unexpected error during upload:', error.message)
+      setFailed(error.message)
     } finally {
     }
   }
@@ -239,14 +239,14 @@ const FormLayoutsSeparator = () => {
       console.error('An unexpected error occurred:', error.message)
 
       // Return null or handle error as needed
-       isMounted.current = false;
+      isMounted.current = false
     } finally {
       // Reset success and failure after a delay
       setTimeout(() => {
         setSuccess('')
       }, 9000)
 
-       clearForm()
+      clearForm()
 
       setFormDisabled(false)
       setLoading(false)
@@ -357,7 +357,7 @@ const FormLayoutsSeparator = () => {
                     <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                     <input
                       hidden
-                        disabled={imageUrl2 || formDisabled}
+                      disabled={imageUrl2 || formDisabled}
                       type='file'
                       onChange={e => {
                         const file = e.target.files[0]
@@ -393,7 +393,7 @@ const FormLayoutsSeparator = () => {
                       <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                       <input
                         hidden
-                          disabled={imageUrl3 || formDisabled}
+                        disabled={imageUrl3 || formDisabled}
                         type='file'
                         onChange={e => {
                           const file = e.target.files[0]
@@ -517,27 +517,27 @@ const FormLayoutsSeparator = () => {
                 </Select>
               </FormControl>
             </Grid>
-             <Grid container item xs={12} sm={6}>
-        {productSizes.map((size, index) => (
-          <div className='flex items-center my-1' key={index}>
-            <TextField
-              fullWidth
-              label={`Product Size`}
-              placeholder={`e.g., 36/XL`}
-              value={size}
-              disabled={formDisabled}
-              onChange={(e) => handleSizeChange(index, e.target.value)}
-            />
-            <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => handleRemoveSize(index)}/>
-          </div>
-        ))}
-              <div className='flex items-center my-2' >
+            <Grid container item xs={12} sm={6}>
+              {productSizes.map((size, index) => (
+                <div className='flex items-center my-1' key={index}>
+                  <TextField
+                    fullWidth
+                    label={`Product Size`}
+                    placeholder={`e.g., 36/XL`}
+                    value={size}
+                    disabled={formDisabled}
+                    onChange={e => handleSizeChange(index, e.target.value)}
+                  />
+                  <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => handleRemoveSize(index)} />
+                </div>
+              ))}
+              <div className='flex items-center my-2'>
                 <Button onClick={handleAddSize} variant='outlined' size='small'>
                   <AddRoundedIcon />
                   new size
                 </Button>
-        </div>
-      </Grid>
+              </div>
+            </Grid>
           </Grid>
         </CardContent>
         <Divider sx={{ margin: 0 }} />

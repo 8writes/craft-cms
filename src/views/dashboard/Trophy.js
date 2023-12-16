@@ -9,6 +9,7 @@ import { useUser } from 'src/@core/context/userDataContext'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useState } from 'react'
 import { Alert, AlertTitle, Grid } from '@mui/material'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL

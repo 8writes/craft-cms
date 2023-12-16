@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 
 // ** MUI Imports
 import Paper from '@mui/material/Paper'
@@ -11,12 +11,18 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
-import { useUser } from 'src/@core/context/userDataContext'
+import { Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+import EditIcon from '@mui/icons-material/Edit'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import TextField from '@mui/material/TextField'
 
-// ** Demo Components Imports
+import { useUser } from 'src/@core/context/userDataContext'
 import IntroHeading from './IntroHeading'
-import { Alert, AlertTitle, Typography } from '@mui/material'
 
 import { createClient } from '@supabase/supabase-js'
 
@@ -31,7 +37,7 @@ const columns = [
   { id: 'sn', label: 'S/N' },
   { id: 'image', label: 'Preview' },
   { id: 'name', label: 'Product Name' },
-  { id: 'size', label: 'Size'},
+  { id: 'size', label: 'Size' },
   {
     id: 'date',
     label: 'Date'
@@ -50,12 +56,16 @@ const TableStickyHeader = () => {
   const [success, setSuccess] = useState('')
   const [failed, setFailed] = useState('')
   const [suspense, setSuspense] = useState('')
+  const [isLoading, setIsLoading] = useState('')
 
   // ** States
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [tableData, setTableData] = useState([])
   const [userId, setUserId] = useState('')
+  const [editProductId, setEditProductId] = useState(null)
+  const [editPrice, setEditPrice] = useState(0)
+  const [editStock, setEditStock] = useState(0)
 
   useEffect(() => {
     const getUser = async () => {
@@ -141,14 +151,49 @@ const TableStickyHeader = () => {
       if (error) {
         setFailed(error.message)
       } else {
+        setFailed('')
         setSuccess('Product deleted successfully!')
       }
 
       await fetchData()
     } catch (error) {
-      console.error('Error deleting data:', error.message)
+       setFailed(error.message)
     } finally {
       // Reset success and failure after a delay
+      setTimeout(() => {
+        setSuccess('')
+      }, 3000)
+    }
+  }
+
+  const handleEdit = (id, price, stock) => {
+    setEditProductId(id)
+    setEditPrice(price)
+    setEditStock(stock)
+  }
+
+  const handleSaveEdit = async () => {
+    setIsLoading(true)
+    try {
+      const { error } = await supabase
+        .from(`${storeName}`)
+        .update({ price: editPrice, stock: editStock })
+        .eq('user_id', userId)
+        .eq('id', editProductId)
+
+      if (error) {
+        setFailed(error.message)
+      } else {
+        setSuccess('Product updated successfully!')
+      }
+
+      await fetchData()
+      setEditProductId(null)
+    } catch (error) {
+      console.error('Error updating data:', error.message)
+    } finally {
+      setIsLoading(false)
+
       setTimeout(() => {
         setSuccess('')
       }, 3000)
@@ -164,10 +209,9 @@ const TableStickyHeader = () => {
     setPage(0)
   }
 
-
- return (
+  return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-    {success && (
+      {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
           <Alert variant='filled' severity='success' sx={{ '& a': { fontWeight: 500 } }}>
             <AlertTitle>{success}</AlertTitle>
@@ -197,9 +241,9 @@ const TableStickyHeader = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+            {tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
               <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
-                {columns.map((column) => (
+                {columns.map(column => (
                   <TableCell key={column.id} align={column.align}>
                     {column.id === 'image' ? (
                       <img
@@ -208,8 +252,6 @@ const TableStickyHeader = () => {
                         style={{ width: '60px', height: '50px', borderRadius: '5px' }}
                       />
                     ) : column.id === 'size' ? (
-                        
-                      // Map and join the size values with ","
                       row[column.id].map((size, index) => (
                         <span key={index}>
                           {size}
@@ -224,7 +266,15 @@ const TableStickyHeader = () => {
                   </TableCell>
                 ))}
                 <TableCell>
-                  <LoadingButton size='small' variant='outlined' onClick={() => handleDelete(row.id)}>
+                  <LoadingButton
+                    sx={{ m: 1, width: '100%'}}
+                    size='small'
+                    variant='outlined'
+                    onClick={() => handleEdit(row.id, row.price, row.stock)}
+                  >
+                    Edit
+                  </LoadingButton>
+                  <LoadingButton  sx={{ m: 1, width: '100%'}} size='small' variant='outlined' onClick={() => handleDelete(row.id)}>
                     Delete
                   </LoadingButton>
                 </TableCell>
@@ -250,6 +300,41 @@ const TableStickyHeader = () => {
           </>
         )}
       </TableContainer>
+
+      {/* Edit Dialog */}
+      <Dialog open={Boolean(editProductId)} onClose={() => setEditProductId(null)}>
+        <DialogTitle className='flex justify-between items-center'>
+          Update Product <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setEditProductId(null)} />
+        </DialogTitle>
+        <DialogContent className='grid gap-5'>
+          <Grid item xs={12} sm={3}></Grid>
+          <Grid item xs={12} sm={3}>
+            <TextField label='Price(₦)' type='number' value={editPrice} onChange={e => setEditPrice(e.target.value)} />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <FormControl fullWidth>
+              <InputLabel id='form-layouts-separator-select-label'>Product Inventory</InputLabel>
+              <Select
+                label='Product Inventory'
+                type='text'
+                id='form-layouts-separator-select'
+                labelId='form-layouts-separator-select-label'
+                value={editStock}
+                onChange={e => setEditStock(e.target.value)}
+              >
+                <MenuItem value='In Stock'>In Stock</MenuItem>
+                <MenuItem value='Out of Stock'>Out of Stock</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton loading={isLoading} variant='outlined' onClick={handleSaveEdit}>
+            Save
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
+
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
@@ -260,7 +345,7 @@ const TableStickyHeader = () => {
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </Paper>
-  );
-};
+  )
+}
 
-export default TableStickyHeader;
+export default TableStickyHeader
