@@ -14,7 +14,7 @@ import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
-import { styled } from '@mui/material/styles'
+import { styled, useTheme } from '@mui/material/styles'
 import LoadingButton from '@mui/lab/LoadingButton'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
@@ -42,6 +42,10 @@ const ButtonStyled = styled(Button)(({ theme }) => ({
 
 const FormLayoutsSeparator = () => {
   const userData = useUser()
+
+  // ** Hook
+  const theme = useTheme()
+  const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
 
   const [productName, setProductName] = useState('')
   const [productDescription, setProductDescription] = useState('')
@@ -265,6 +269,14 @@ const FormLayoutsSeparator = () => {
     setProductSizes([''])
   }
 
+  // Styled component for the triangle shaped background image
+const TriangleImg = styled('img')({
+  right: 0,
+  bottom: 0,
+  height: 170,
+  position: 'absolute',
+})
+  
   return (
     <Card>
       {success && (
@@ -284,14 +296,15 @@ const FormLayoutsSeparator = () => {
           </Alert>
         </Grid>
       )}
-      <div className='flex items-center m-4 flex-wrap'>
-        <CardHeader title='Add New Product' titleTypographyProps={{ variant: 'h6' }} />
+      <div className='flex relative justify-between items-center p-2 flex-wrap'>
+        <CardHeader title='Add Product' titleTypographyProps={{ variant: 'h6' }} />
         <Link href='/products' passHref>
-          <Button size='medium' variant='contained'>
+          <Button sx={{ zIndex: 10 }} size='medium' variant='contained'>
             <KeyboardBackspaceIcon className='mr-2' />
-            View all Products
+            All Products
           </Button>
         </Link>
+        <TriangleImg alt='triangle background' src={`/images/misc/${imageSrc}`} />
       </div>
       <Divider sx={{ margin: 0 }} />
       <form method='POST' autoComplete='off' onSubmit={e => e.preventDefault()}>
