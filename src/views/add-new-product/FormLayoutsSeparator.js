@@ -298,7 +298,7 @@ const FormLayoutsSeparator = () => {
       <div className='flex items-center m-4 flex-wrap'>
         <CardHeader title='Add New Product' titleTypographyProps={{ variant: 'h6' }} />
         <Link href='/products' passHref>
-          <Button size='medium' variant='outlined'>
+          <Button size='medium' variant='contained'>
             <KeyboardBackspaceIcon className='mr-2' />
             View all Products
           </Button>
