@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/router'
 import { v4 as uuidv4 } from 'uuid'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -25,6 +24,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+import DoneAllRoundedIcon from '@mui/icons-material/DoneAllRounded'
 
 import { createClient } from '@supabase/supabase-js'
 
@@ -298,7 +298,7 @@ const FormLayoutsSeparator = () => {
       <div className='flex items-center m-4 flex-wrap'>
         <CardHeader title='Add New Product' titleTypographyProps={{ variant: 'h6' }} />
         <Link href='/products' passHref>
-          <Button size='medium' variant='outlined'>
+          <Button size='medium' variant='contained'>
             <KeyboardBackspaceIcon className='mr-2' />
             View all Products
           </Button>
@@ -317,7 +317,7 @@ const FormLayoutsSeparator = () => {
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
                 <Box>
                   <ButtonStyled component='label' variant='text'>
-                    {imageUrl1 ? <div className='text-green-400'>Uploaded</div> : <>Image 1</>}
+                    {imageUrl1 ? <div className='text-green-400'><DoneAllRoundedIcon /></div> : <></>}
                     <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                     <input
                       hidden
@@ -339,20 +339,17 @@ const FormLayoutsSeparator = () => {
                             setImageUrl1('')
                           }}
                         >
-                          Remove
+                          <CloseRoundedIcon />
                         </Button>
                       </>
                     ) : (
                       <></>
                     )}
                   </ButtonStyled>
-                  <Typography variant='body2' sx={{ marginTop: 5 }}>
-                    Supported formats: JPEG, PNG.
-                  </Typography>
                 </Box>
                 <Box>
                   <ButtonStyled component='label' variant='text'>
-                    {imageUrl2 ? <div className='text-green-400'>Uploaded</div> : <>Image 2</>}
+                    {imageUrl2 ? <div className='text-green-400'><DoneAllRoundedIcon /></div> : <></>}
                     <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                     <input
                       hidden
@@ -374,21 +371,18 @@ const FormLayoutsSeparator = () => {
                             setImageUrl2('')
                           }}
                         >
-                          Remove
+                          <CloseRoundedIcon />
                         </Button>
                       </>
                     ) : (
                       <></>
                     )}
                   </ButtonStyled>
-                  <Typography variant='body2' sx={{ marginTop: 5 }}>
-                    Supported formats: JPEG, PNG.
-                  </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
                   <Box>
                     <ButtonStyled component='label' variant='text'>
-                      {imageUrl3 ? <div className='text-green-400'>Uploaded</div> : <>Image 3</>}
+                      {imageUrl3 ? <div className='text-green-400'><DoneAllRoundedIcon /></div> : <></>}
                       <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                       <input
                         hidden
@@ -410,16 +404,13 @@ const FormLayoutsSeparator = () => {
                               setImageUrl3('')
                             }}
                           >
-                            Remove
+                            <CloseRoundedIcon />
                           </Button>
                         </>
                       ) : (
                         <></>
                       )}
                     </ButtonStyled>
-                    <Typography variant='body2' sx={{ marginTop: 5 }}>
-                      Supported formats: JPEG, PNG.
-                    </Typography>
                   </Box>
                 </Box>
               </Box>
