@@ -72,8 +72,8 @@ const RegisterPage = () => {
   const [storeName, setStoreName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [failed, setFailed] = useState(false)
+  const [success, setSuccess] = useState('')
+  const [failed, setFailed] = useState('')
   const [checkbox, setCheckbox] = useState(false)
   const [passwordError, setPasswordError] = useState('')
 
@@ -84,7 +84,6 @@ const RegisterPage = () => {
   }
 
   // ** Hook
-  const theme = useTheme()
 
   const handleClickShowPassword = () => setShowPassword(show => !show)
 
@@ -124,13 +123,11 @@ const RegisterPage = () => {
     
       if (error) {
         // Handle login error
-        console.error('Signup error:', error.message)
-        setFailed(true)
-        setSuccess(false)
+        setFailed(error.message)
       } else {
         // Handle login success
-        setSuccess(true)
-        setFailed(false)
+        setSuccess('Account created successfully!')
+    setFailed('')
          setTimeout(() => {
           router.push('/login')
         }, 1500)
