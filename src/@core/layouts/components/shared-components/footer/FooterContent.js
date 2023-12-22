@@ -10,7 +10,7 @@ const FooterContent = () => {
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-      <Typography sx={{ mr: 2 }}>{`© ${new Date().getFullYear()}, STOREX `}</Typography>
+      <Typography sx={{ mr: 2 }}>{`© ${new Date().getFullYear()}, SYNCSTORE `}</Typography>
       {hidden ? null : (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', '& :not(:last-child)': { mr: 4 } }}>
           <Link
@@ -20,7 +20,6 @@ const FooterContent = () => {
           
           </Link>
           <Link target='_blank' href='https://themeselection.com/'>
-            
           </Link>
           <Link
             target='_blank'
