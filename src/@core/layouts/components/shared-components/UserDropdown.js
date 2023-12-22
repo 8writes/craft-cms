@@ -24,7 +24,7 @@ import Typography from '@mui/material/Typography'
 import CogOutline from 'mdi-material-ui/CogOutline'
 import LogoutVariant from 'mdi-material-ui/LogoutVariant'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
-import Link from 'next/link'
+import { useUser } from 'src/@core/context/userDataContext'
 
 // ** Styled Components
 const BadgeContentSpan = styled('span')(({ theme }) => ({
@@ -37,6 +37,7 @@ const BadgeContentSpan = styled('span')(({ theme }) => ({
 
 const UserDropdown = () => {
   // ** States
+  const userData = useUser()
   const [anchorEl, setAnchorEl] = useState(null)
 
   // ** Hooks
@@ -80,6 +81,12 @@ const UserDropdown = () => {
     }
   }
 
+  
+  const userFirstName = userData?.user_metadata?.first_name
+  const userLastName = userData?.user_metadata?.last_name
+
+  const firstLetterOfLastName = userLastName ? userLastName.slice(0, 1) : '';
+  
   return (
     <Fragment>
       <Badge
@@ -114,7 +121,7 @@ const UserDropdown = () => {
               <Avatar alt='John Doe' src='/images/avatars/1.png' sx={{ width: '2.5rem', height: '2.5rem' }} />
             </Badge>
             <Box sx={{ display: 'flex', marginLeft: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
-              <Typography sx={{ fontWeight: 600 }}>John Doe</Typography>
+              <Typography sx={{ fontWeight: 600 }}>{userFirstName} .{firstLetterOfLastName}</Typography>
             </Box>
           </Box>
         </Box>
