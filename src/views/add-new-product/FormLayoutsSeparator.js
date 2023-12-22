@@ -42,7 +42,6 @@ const ButtonStyled = styled(Button)(({ theme }) => ({
 
 const FormLayoutsSeparator = () => {
   const userData = useUser()
-  const router = useRouter()
 
   const [productName, setProductName] = useState('')
   const [productDescription, setProductDescription] = useState('')
