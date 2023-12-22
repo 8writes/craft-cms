@@ -2,13 +2,13 @@
 import { useState } from 'react'
 import { useUser } from 'src/@core/context/userDataContext'
 import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import CardContent from '@mui/material/CardContent'
-import { styled } from '@mui/material/styles'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
-import Typography from '@mui/material/Typography'
+import Skeleton from '@mui/material/Skeleton';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -16,15 +16,10 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-const ButtonStyled = styled(Button)(({ theme }) => ({
-  [theme.breakpoints.down('sm')]: {
-    width: '100%',
-    textAlign: 'center'
-  }
-}))
-
 const StoreSetting = () => {
   const userData = useUser()
+  const isLoading = !userData
+
   const [success, setSuccess] = useState('')
   const [failed, setFailed] = useState('')
 
@@ -75,17 +70,6 @@ const StoreSetting = () => {
     }
   }
 
-  if (!userData) {
-    return (
-      <div className='grid justify-center h-96 p-10'>
-        <Typography variant='h4' sx={{ my: 4, color: 'primary.main' }} className='animate-spin'>
-          &#128640;
-        </Typography>
-        <Typography variant='h6'>Loading data ...</Typography>
-      </div>
-    )
-  }
-
   return (
     <CardContent>
        {success && (
@@ -102,25 +86,33 @@ const StoreSetting = () => {
           </Alert>
         </Grid>
       )}
-      <form>
-        <Grid container spacing={7} sx={{ marginTop: 1 }}>
+      {isLoading ? (
+        <Grid container spacing={7} sx={{ marginTop: 1, marginBottom: 10 }}>
           <Grid item xs={12} sm={6}>
-            <TextField fullWidth label='Store Name' defaultValue={storeName ? storeName.toUpperCase() : ''} disabled />
-          </Grid>
-          {userStatus ? (<Grid item xs={12} sx={{ mt: 5 }}>
+              <Skeleton animation="wave" height={70} />
+            </Grid>
+        </Grid>
+      ) : (
+        <form>
+          <Grid container spacing={7} sx={{ marginTop: 1 }}>
+            <Grid item xs={12} sm={6}>
+              <TextField fullWidth label='Store Name' defaultValue={storeName ? storeName.toUpperCase() : ''} disabled />
+            </Grid>
+            {userStatus ? (<Grid item xs={12} sx={{ mt: 5 }}>
               <Alert severity='success' sx={{ '& a': { fontWeight: 400 } }}>
                 <AlertTitle>Your store is activated!</AlertTitle>
               </Alert>
-            </Grid>): (
+            </Grid>) : (
             
-            <Grid item xs={12} sx={{ mt: 5 }}>
-              <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
-                <AlertTitle>Kindly activate your store <span className='cursor-pointer underline' onClick={handleStorage}>Here</span></AlertTitle>
-              </Alert>
-            </Grid>
-          )}
-        </Grid>
-      </form>
+              <Grid item xs={12} sx={{ mt: 5 }}>
+                <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
+                  <AlertTitle>Kindly activate your store <span className='cursor-pointer underline' onClick={handleStorage}>Here</span></AlertTitle>
+                </Alert>
+              </Grid>
+            )}
+          </Grid>
+        </form>
+      )}
     </CardContent>
   )
 }

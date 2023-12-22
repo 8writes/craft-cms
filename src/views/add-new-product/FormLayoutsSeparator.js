@@ -265,17 +265,6 @@ const FormLayoutsSeparator = () => {
     setProductSizes([''])
   }
 
-  if (!userData) {
-    return (
-      <div className='grid justify-center h-96 p-10'>
-        <Typography variant='h4' sx={{ my: 4, color: 'primary.main' }} className='animate-spin'>
-          &#128640;
-        </Typography>
-        <Typography variant='h6'>Loading data ...</Typography>
-      </div>
-    )
-  }
-
   return (
     <Card>
       {success && (

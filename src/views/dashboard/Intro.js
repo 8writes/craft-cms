@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { useUser } from 'src/@core/context/userDataContext'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useState } from 'react'
-import { Alert, AlertTitle, Grid } from '@mui/material'
+import { Alert, AlertTitle, Grid, Skeleton } from '@mui/material'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import { createClient } from '@supabase/supabase-js'
 
@@ -100,7 +100,7 @@ const Trophy = () => {
         </Grid>
       )}
       <CardContent>
-        <Typography variant='h5'>Welcome, {userFirstName}</Typography>
+        {userData ? ( <><Typography variant='h5'>Welcome,  {userFirstName}</Typography></> ) : (<><Skeleton animation="wave" height={30} width={200}/></>)} 
         {userData ? (
           <>
             <Typography variant='h6'></Typography>
@@ -110,11 +110,10 @@ const Trophy = () => {
           </>
         ) : (
           <>
-            <Typography variant='h6' sx={{ letterSpacing: '0.25px' }}>
-              Loading...
-            </Typography>
+            <Skeleton animation="wave" height={30} width={250}/>
           </>
         )}
+        {userData ? (<>
         {userStatus ? (
           <>
              <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
@@ -143,6 +142,7 @@ const Trophy = () => {
            
           </>
         )}
+        </>) : (<><Skeleton animation="wave" height={60} width={240} /></>)} 
 
         <TriangleImg alt='triangle background' src={`/images/misc/${imageSrc}`} />
       </CardContent>

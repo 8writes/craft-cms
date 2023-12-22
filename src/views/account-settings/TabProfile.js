@@ -9,32 +9,32 @@ import TextField from '@mui/material/TextField'
 import AlertTitle from '@mui/material/AlertTitle'
 import IconButton from '@mui/material/IconButton'
 import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
+import Skeleton from '@mui/material/Skeleton';
+
 
 // ** Icons Imports
 import Close from 'mdi-material-ui/Close'
 
 const TabProfile = () => {
   const userData = useUser()
-
+  const isLoading = !userData;
+  
   const userFirstName = userData?.user_metadata?.first_name
   const userLastName = userData?.user_metadata?.last_name
   const userEmail = userData?.email
   const createdAt = userData?.created_at
-
-  if (!userData) {
-    return (
-      <div className='grid justify-center h-96 p-10'>
-        <Typography variant='h4' sx={{ my: 4, color: 'primary.main' }} className='animate-spin'>
-          &#128640;
-        </Typography>
-        <Typography variant='h6'>Loading data ...</Typography>
-      </div>
-    )
-  }
-
+    
   return (
     <CardContent>
+      {isLoading ? (
+        <Grid container spacing={7} sx={{ marginTop: 1, marginBottom: 10 }}>
+          {[...Array(6)].map((_, index) => (
+            <Grid item xs={12} sm={6} key={index}>
+              <Skeleton animation="wave" height={70} />
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
       <form>
         <Grid container spacing={7} sx={{ marginTop: 1, marginBottom: 10 }}>
           <Grid item xs={12} sm={6}>
@@ -90,7 +90,8 @@ const TabProfile = () => {
             </Alert>
           </Grid>
         </Grid>
-      </form>
+          </form>
+          )}
     </CardContent>
   )
 }

@@ -11,6 +11,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
+import { Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Skeleton, Typography } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import Dialog from '@mui/material/Dialog'
@@ -18,7 +19,6 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
-import { Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 
 import { useUser } from 'src/@core/context/userDataContext'
 import IntroHeading from './IntroHeading'
@@ -282,9 +282,11 @@ const TableStickyHeader = () => {
           </TableBody>
         </Table>
         {suspense ? (
-          <div className='text-center my-10'>
-            <Typography variant='h5' className='text-slate-100'>
-              {suspense}
+          <div className='text-center'>
+            <Typography variant='h5' className='px-4'>
+              <Skeleton animation='wave' height={80} />
+              <Skeleton animation='wave' height={80} />
+              <Skeleton animation='wave' height={80} />
             </Typography>
           </div>
         ) : (
