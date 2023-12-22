@@ -2,8 +2,6 @@
 import Head from 'next/head'
 import { Router } from 'next/router'
 
-import { useRouter } from 'next/router'
-
 // ** Loader Import
 import NProgress from 'nprogress'
 
@@ -28,9 +26,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css'
 
 // ** Global css styles
 import '../../styles/globals.css'
-import { UserProvider, useUser } from 'src/@core/context/userDataContext'
-import { useEffect } from 'react'
-import Cookies from 'js-cookie'
+import { UserProvider } from 'src/@core/context/userDataContext'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -58,12 +54,12 @@ const App = props => {
   return (
     <CacheProvider value={emotionCache}>
       <Head>
-        <title>{`${themeConfig.templateName} - Material Design React Admin Template`}</title>
+        <title>{`${themeConfig.templateName} - Content Management System`}</title>
         <meta
           name='description'
-          content={`${themeConfig.templateName} – Material Design React Admin Dashboard Template – is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.`}
+          content={`${themeConfig.templateName} – Content Management System for your E-commerce store `}
         />
-        <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
+        <meta name='keywords' content='E-commerce, store, shopify, cms, content, management, system.' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
       <UserProvider>

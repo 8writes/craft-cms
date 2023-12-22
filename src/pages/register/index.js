@@ -62,7 +62,6 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
 }))
 
 const RegisterPage = () => {
-  const userData = useUser()
   const router = useRouter()
 
   // ** States
@@ -117,7 +116,8 @@ const RegisterPage = () => {
           data: {
             first_name: firstName,
             last_name: lastName,
-            store_name: storeName
+            store_name: storeName,
+            subscription: 'Free Plan'
           }
         }
       })

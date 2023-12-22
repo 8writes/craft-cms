@@ -17,11 +17,9 @@
   },
   "homepage": "https://themeselection.com/products/materio-free-mui-react-nextjs-admin-template/",
   "keywords": [
-    "react",
-    "javascript",
-    "admin",
-    "dashboard",
-    "material-design"
+    "e-commerce store",
+    "content management",
+    "shopify"
   ],
   "scripts": {
     "dev": "next dev",

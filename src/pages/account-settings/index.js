@@ -12,7 +12,8 @@ import MuiTab from '@mui/material/Tab'
 
 // ** Icons Imports
 import LockOpenOutline from 'mdi-material-ui/LockOpenOutline'
-import InformationOutline from 'mdi-material-ui/InformationOutline'
+import StorefrontRoundedIcon from '@mui/icons-material/StorefrontRounded'
+import ManageAccountsRoundedIcon from '@mui/icons-material/ManageAccountsRounded'
 
 // ** Demo Tabs Imports
 import StoreSetting from 'src/views/account-settings/TabStoreSetting'
@@ -60,7 +61,7 @@ const AccountSettings = () => {
             value='store'
             label={
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <InformationOutline />
+                <StorefrontRoundedIcon />
                 <TabName>Store Setting</TabName>
               </Box>
             }
@@ -77,7 +78,7 @@ const AccountSettings = () => {
             value='account'
             label={
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <InformationOutline />
+                <ManageAccountsRoundedIcon  />
                 <TabName>My Account</TabName>
               </Box>
             }

@@ -2,9 +2,9 @@
 import HomeOutline from 'mdi-material-ui/HomeOutline'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import CogOutline from 'mdi-material-ui/CogOutline'
-import InformationOutline from 'mdi-material-ui/InformationOutline'
-import Cookies from 'js-cookie'
-import { useRouter } from 'next/router'
+import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
+import ListAltRoundedIcon from '@mui/icons-material/ListAltRounded'
+import LiveHelpRoundedIcon from '@mui/icons-material/LiveHelpRounded'
 
 const navigation = () => {
   
@@ -19,9 +19,14 @@ const navigation = () => {
       sectionTitle: 'My Store'
     },
     {
-      icon: InformationOutline,
+      icon: CategoryRoundedIcon,
       title: 'Products',
       path: '/products'
+    },
+    {
+      icon: ListAltRoundedIcon,
+      title: 'Orders',
+      path: '#'
     },
     {
       sectionTitle: 'User Account'
@@ -41,7 +46,7 @@ const navigation = () => {
     },
     {
       title: 'Support',
-      icon: InformationOutline,
+      icon: LiveHelpRoundedIcon,
       path: '#',
     }
   ]

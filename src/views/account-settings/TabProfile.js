@@ -56,6 +56,9 @@ const TabProfile = () => {
               disabled
             />
           </Grid>
+           <Grid item xs={12} sm={6}>
+            <TextField fullWidth type='text' label='Subscription' defaultValue='Free Plan' disabled />
+          </Grid>
           {false ? (
             <Grid item xs={12} sx={{ mb: 3 }}>
               <Alert

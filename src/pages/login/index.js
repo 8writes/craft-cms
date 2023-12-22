@@ -51,7 +51,6 @@ const LinkStyled = styled('a')(({ theme }) => ({
 }))
 
 const LoginPage = () => {
-   const userData = useUser();
   const router = useRouter()
 
   // ** State
@@ -59,13 +58,10 @@ const LoginPage = () => {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [failed, setFailed] = useState(false)
+  const [success, setSuccess] = useState('')
+  const [failed, setFailed] = useState('')
 
   const isDisabled = !email || !password
-
-  // ** Hook
-  const theme = useTheme()
 
   const handleClickShowPassword = () => setShowPassword(show => !show)
 
@@ -85,18 +81,17 @@ const LoginPage = () => {
 
       if (error) {
         // Handle login error
-        console.error('Login error:', error.message)
-        setFailed(true)
-        setSuccess(false)
+        setFailed(error.message)
       } else {
-        setSuccess(true)
-        setFailed(false)
+        setFailed('')
+        setSuccess('Login successful!')
         setTimeout(() => {
           router.push('/dashboard')
         }, 1000)
       }
     } catch (error) {
       console.error('Unexpected error during login:', error.message)
+      setFailed('An error occurred during login')
     } finally {
       setLoading(false)
     }
@@ -107,14 +102,14 @@ const LoginPage = () => {
       {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
           <Alert severity='success' sx={{ '& a': { fontWeight: 400 } }}>
-            <AlertTitle>Account login successful</AlertTitle>
+            <AlertTitle>{success}</AlertTitle>
           </Alert>
         </Grid>
       )}
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
           <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
-            <AlertTitle>Invalid email or password</AlertTitle>
+            <AlertTitle>{failed}</AlertTitle>
           </Alert>
         </Grid>
       )}
