@@ -621,7 +621,7 @@ const uploadImage4 = async () => {
         <CardActions>
           <LoadingButton
             disabled={isDisabled}
-            loading={isLoading}
+           loading={Boolean(isLoading)}
             size='large'
             type='submit'
             sx={{ mr: 2 }}

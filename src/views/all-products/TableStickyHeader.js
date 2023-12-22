@@ -328,7 +328,7 @@ const TableStickyHeader = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <LoadingButton loading={isLoading} variant='outlined' onClick={handleSaveEdit}>
+          <LoadingButton loading={Boolean(isLoading)} variant='outlined' onClick={handleSaveEdit}>
             Save
           </LoadingButton>
         </DialogActions>
