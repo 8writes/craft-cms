@@ -54,7 +54,7 @@ const TableStickyHeader = () => {
   const userData = useUser()
   const [success, setSuccess] = useState('')
   const [failed, setFailed] = useState('')
-  const [suspense, setSuspense] = useState('')
+  const [suspense, setSuspense] = useState(true)
   const [isLoading, setIsLoading] = useState('')
 
   // ** States
@@ -87,7 +87,7 @@ const TableStickyHeader = () => {
   const storeName = userData?.user_metadata?.store_name
 
   const fetchData = async () => {
-    setSuspense('Loading products data...')
+    setSuspense(true)
     try {
       const { data, error } = await supabase.from(`${storeName}`).select()
 
@@ -109,7 +109,7 @@ const TableStickyHeader = () => {
     } catch (error) {
       console.error('Error fetching data:', error.message)
     } finally {
-      setSuspense('')
+      setSuspense(false)
     }
   }
 

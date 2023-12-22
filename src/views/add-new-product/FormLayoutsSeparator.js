@@ -55,6 +55,7 @@ const FormLayoutsSeparator = () => {
   const [imageUrl1, setImageUrl1] = useState('')
   const [imageUrl2, setImageUrl2] = useState('')
   const [imageUrl3, setImageUrl3] = useState('')
+  const [imageUrl4, setImageUrl4] = useState('')
   const [isLoading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
   const [failed, setFailed] = useState('')
@@ -106,7 +107,9 @@ const FormLayoutsSeparator = () => {
   const emailAddress = userData?.email
   const storeName = userData?.user_metadata?.store_name
 
-  const isDisabled = !productName || !productDescription || !productStock || !sellingPrice || !imageUrl1
+ const isDisabled = !productName || !productDescription || !productStock || !sellingPrice ||
+  (!imageUrl1 && !imageUrl2 && !imageUrl3 && !imageUrl4);
+
 
   const uploadImage1 = async () => {
     try {
@@ -183,8 +186,33 @@ const FormLayoutsSeparator = () => {
     }
   }
 
+const uploadImage4 = async () => {
+    try {
+      const file = imageUrl4
+
+      const { data, error } = await supabase.storage.from(`${storeName}`).upload(`${userId}/public/${uuidv4()}`, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+
+      if (error) {
+        setFailed(error.message)
+      } else {
+        //   setSuccess('Image 1 uploaded successfully!')
+      }
+
+      const url4 = data.fullPath
+
+      return url4
+    } catch (error) {
+      console.error('An unexpected error occurred:', error.message)
+
+      return null // Return null or handle error as needed
+    }
+}
+  
   // Function to handle form data insertion
-  const handleUploadForm = async (url1, url2, url3) => {
+  const handleUploadForm = async (url1, url2, url3, url4) => {
     try {
       const currentDate = new Date()
       const date = currentDate.toISOString().split('T')[0]
@@ -207,7 +235,8 @@ const FormLayoutsSeparator = () => {
           date: date,
           uploadedImageUrl1: url1,
           uploadedImageUrl2: url2,
-          uploadedImageUrl3: url3
+          uploadedImageUrl3: url3, 
+          uploadedImageUrl4: url4
         }
       ]
 
@@ -236,8 +265,9 @@ const FormLayoutsSeparator = () => {
       const url1 = await uploadImage1()
       const url2 = await uploadImage2()
       const url3 = await uploadImage3()
+      const url4 = await uploadImage4()
 
-      await handleUploadForm(url1, url2, url3)
+      await handleUploadForm(url1, url2, url3, url4)
     } catch (error) {
       console.error('An unexpected error occurred:', error.message)
 
@@ -266,17 +296,18 @@ const FormLayoutsSeparator = () => {
     setImageUrl1('')
     setImageUrl2('')
     setImageUrl3('')
+    setImageUrl4('')
     setProductSizes([''])
   }
 
   // Styled component for the triangle shaped background image
-const TriangleImg = styled('img')({
-  right: 0,
-  bottom: 0,
-  height: 170,
-  position: 'absolute',
-})
-  
+  const TriangleImg = styled('img')({
+    right: 0,
+    bottom: 0,
+    height: 170,
+    position: 'absolute'
+  })
+
   return (
     <Card>
       {success && (
@@ -319,7 +350,13 @@ const TriangleImg = styled('img')({
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
                 <Box>
                   <ButtonStyled component='label' variant='text'>
-                    {imageUrl1 ? <div className='text-green-400'><DoneAllRoundedIcon /></div> : <></>}
+                    {imageUrl1 ? (
+                      <div className='text-green-400'>
+                        <DoneAllRoundedIcon />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                     <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                     <input
                       hidden
@@ -351,7 +388,13 @@ const TriangleImg = styled('img')({
                 </Box>
                 <Box>
                   <ButtonStyled component='label' variant='text'>
-                    {imageUrl2 ? <div className='text-green-400'><DoneAllRoundedIcon /></div> : <></>}
+                    {imageUrl2 ? (
+                      <div className='text-green-400'>
+                        <DoneAllRoundedIcon />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                     <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
                     <input
                       hidden
@@ -382,38 +425,80 @@ const TriangleImg = styled('img')({
                   </ButtonStyled>
                 </Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-                  <Box>
-                    <ButtonStyled component='label' variant='text'>
-                      {imageUrl3 ? <div className='text-green-400'><DoneAllRoundedIcon /></div> : <></>}
-                      <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
-                      <input
-                        hidden
-                        disabled={imageUrl3 || formDisabled}
-                        type='file'
-                        onChange={e => {
-                          const file = e.target.files[0]
-                          setImageUrl3(file)
-                        }}
-                        id='image3'
-                      />
-                      {imageUrl3 ? (
-                        <>
-                          <Button
-                            size='small'
-                            color='error'
-                            disabled={formDisabled}
-                            onClick={() => {
-                              setImageUrl3('')
-                            }}
-                          >
-                            <CloseRoundedIcon />
-                          </Button>
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                    </ButtonStyled>
-                  </Box>
+                  <ButtonStyled component='label' variant='text'>
+                    {imageUrl3 ? (
+                      <div className='text-green-400'>
+                        <DoneAllRoundedIcon />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
+                    <input
+                      hidden
+                      disabled={imageUrl3 || formDisabled}
+                      type='file'
+                      onChange={e => {
+                        const file = e.target.files[0]
+                        setImageUrl3(file)
+                      }}
+                      id='image3'
+                    />
+                    {imageUrl3 ? (
+                      <>
+                        <Button
+                          size='small'
+                          color='error'
+                          disabled={formDisabled}
+                          onClick={() => {
+                            setImageUrl3('')
+                          }}
+                        >
+                          <CloseRoundedIcon />
+                        </Button>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </ButtonStyled>
+                </Box>
+                <Box>
+                  <ButtonStyled component='label' variant='text'>
+                    {imageUrl4 ? (
+                      <div className='text-green-400'>
+                        <DoneAllRoundedIcon />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
+                    <input
+                      hidden
+                      disabled={imageUrl4 || formDisabled}
+                      type='file'
+                      onChange={e => {
+                        const file = e.target.files[0]
+                        setImageUrl4(file)
+                      }}
+                      id='image4'
+                    />
+                    {imageUrl4 ? (
+                      <>
+                        <Button
+                          size='small'
+                          color='error'
+                          disabled={formDisabled}
+                          onClick={() => {
+                            setImageUrl4('')
+                          }}
+                        >
+                          <CloseRoundedIcon />
+                        </Button>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </ButtonStyled>
                 </Box>
               </Box>
             </Grid>
