@@ -282,12 +282,10 @@ const TableStickyHeader = () => {
           </TableBody>
         </Table>
         {suspense ? (
-          <div className='text-center'>
-            <Typography variant='h5' className='px-4'>
+          <div className='px-4'>
               <Skeleton animation='wave' height={80} />
               <Skeleton animation='wave' height={80} />
               <Skeleton animation='wave' height={80} />
-            </Typography>
           </div>
         ) : (
           <>
