@@ -230,8 +230,7 @@ const FormLayoutsSeparator = () => {
       const fileInput = document.getElementById('imageInput')
       fileInput.click()
     } else {
-      setFailed('Maximum number of images selected')
-      setMaxImage(true)
+      setFailed('Maximum number of images')
     }
   }
 
@@ -279,7 +278,7 @@ const FormLayoutsSeparator = () => {
                   selectedImages.map((_, index) => (
                     <Box key={index}>
                       <ButtonStyled component='label' variant='text'>
-                        <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
+                        <AddPhotoAlternateOutlinedIcon sx={{ width: '75px', height: '50px' }} />
                         <input
                           hidden
                           disabled={formDisabled}
@@ -297,15 +296,13 @@ const FormLayoutsSeparator = () => {
                           onClick={() => {
                             setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index))
                           }}
+                         
                         >
                           <CloseRoundedIcon />
                         </Button>
                       </ButtonStyled>
                     </Box>
                   ))}
-                {maxImage ? (<>
-                
-                </>) : (
                   <Box>
                     <ButtonStyled variant='text' onClick={handleAddMoreImages} disabled={formDisabled}>
                       <AddRoundedIcon sx={{ width: '100px', height: '50px' }} />
@@ -321,7 +318,6 @@ const FormLayoutsSeparator = () => {
                       }}
                     />
                   </Box>
-                )}
               </Box>
             </Grid>
             <Grid item xs={12}>
