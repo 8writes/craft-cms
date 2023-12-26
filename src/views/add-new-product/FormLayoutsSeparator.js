@@ -275,10 +275,16 @@ const FormLayoutsSeparator = () => {
             <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
                 {selectedImages &&
-                  selectedImages.map((_, index) => (
-                    <Box className='' key={index}>
+                  selectedImages.map((image, index) => (
+                    <Box key={index}>
                       <ButtonStyled component='label' variant='text'>
-                        <AddPhotoAlternateOutlinedIcon sx={{ width: '50px', height: '50px' }} />
+                        {image && (
+                          <img
+                            src={URL.createObjectURL(image)}
+                            alt={`Selected Image ${index + 1}`}
+                            style={{ width: '50px', height: '50px', marginRight: '8px', borderRadius: '5px' }}
+                          />
+                        )}
                         <input
                           hidden
                           disabled={formDisabled}
@@ -296,28 +302,27 @@ const FormLayoutsSeparator = () => {
                           onClick={() => {
                             setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index))
                           }}
-                         
                         >
                           <CloseRoundedIcon />
                         </Button>
                       </ButtonStyled>
                     </Box>
                   ))}
-                  <Box>
-                    <ButtonStyled variant='text' onClick={handleAddMoreImages} disabled={formDisabled}>
-                      <AddRoundedIcon sx={{ width: '100px', height: '50px' }} />
-                      Add Image
-                    </ButtonStyled>
-                    <input
-                      hidden
-                      type='file'
-                      id='imageInput'
-                      onChange={e => {
-                        const file = e.target.files[0]
-                        setSelectedImages(prevImages => [...prevImages, file])
-                      }}
-                    />
-                  </Box>
+                <Box>
+                  <ButtonStyled variant='text' onClick={handleAddMoreImages} disabled={formDisabled}>
+                    <AddRoundedIcon sx={{ width: '100px', height: '50px' }} />
+                    Add Image
+                  </ButtonStyled>
+                  <input
+                    hidden
+                    type='file'
+                    id='imageInput'
+                    onChange={e => {
+                      const file = e.target.files[0]
+                      setSelectedImages(prevImages => [...prevImages, file])
+                    }}
+                  />
+                </Box>
               </Box>
             </Grid>
             <Grid item xs={12}>
@@ -386,7 +391,7 @@ const FormLayoutsSeparator = () => {
                   <MenuItem value='shoe'>Shoe</MenuItem>
                   <MenuItem value='bag'>Bag</MenuItem>
                   <MenuItem value='phone'>Phone</MenuItem>
-                    <MenuItem value='tablet'>Tablet</MenuItem>
+                  <MenuItem value='tablet'>Tablet</MenuItem>
                   <MenuItem value='laptop'>Laptop</MenuItem>
                   <MenuItem value='kids'>Kids Wear</MenuItem>
                   <MenuItem value='adultMen'>Adults Wear (Men)</MenuItem>
