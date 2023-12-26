@@ -303,13 +303,14 @@ const FormLayoutsSeparator = () => {
                       </ButtonStyled>
                     </Box>
                   ))}
-                {maxImage && (
+                {maxImage ? (<>
+                
+                </>) : (
                   <Box>
                     <ButtonStyled variant='text' onClick={handleAddMoreImages} disabled={formDisabled}>
                       <AddRoundedIcon sx={{ width: '100px', height: '50px' }} />
                       Add Image
                     </ButtonStyled>
-                    {/* Hidden file input triggered by the Add More button */}
                     <input
                       hidden
                       type='file'
@@ -389,6 +390,7 @@ const FormLayoutsSeparator = () => {
                   <MenuItem value='shoe'>Shoe</MenuItem>
                   <MenuItem value='bag'>Bag</MenuItem>
                   <MenuItem value='phone'>Phone</MenuItem>
+                    <MenuItem value='tablet'>Tablet</MenuItem>
                   <MenuItem value='laptop'>Laptop</MenuItem>
                   <MenuItem value='kids'>Kids Wear</MenuItem>
                   <MenuItem value='adultMen'>Adults Wear (Men)</MenuItem>
