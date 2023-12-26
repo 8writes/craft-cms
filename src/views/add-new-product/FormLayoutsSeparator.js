@@ -59,12 +59,14 @@ const FormLayoutsSeparator = () => {
   const [formDisabled, setFormDisabled] = useState(false)
   const [productSizes, setProductSizes] = useState([])
   const [selectedImages, setSelectedImages] = useState([])
+  const [maxImage, setMaxImage] = useState(false)
 
   const MAX_IMAGES = 4 // Maximum number of images allowed
 
   const isMounted = useRef(true)
 
-  const isDisabled = !productName || !productDescription || !productStock || !sellingPrice || !productTag || selectedImages.length === 0;
+  const isDisabled =
+    !productName || !productDescription || !productStock || !sellingPrice || !productTag || selectedImages.length === 0
 
   // Function to handle size change
   const handleSizeChange = (index, value) => {
@@ -111,8 +113,7 @@ const FormLayoutsSeparator = () => {
     try {
       const file = selectedImages[index]
 
-      if (!file === selectedImages[index]) { 
-
+      if (!file === selectedImages[index]) {
         return null
       }
 
@@ -123,7 +124,7 @@ const FormLayoutsSeparator = () => {
 
       if (error) {
         setFailed(error.message)
-      } 
+      }
 
       const url = data.fullPath
 
@@ -229,7 +230,8 @@ const FormLayoutsSeparator = () => {
       const fileInput = document.getElementById('imageInput')
       fileInput.click()
     } else {
-      setFailed('Maximum number of images exceeded')
+      setFailed('Maximum number of images selected')
+      setMaxImage(true)
     }
   }
 
@@ -273,52 +275,52 @@ const FormLayoutsSeparator = () => {
             </Grid>
             <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-                {selectedImages && selectedImages.map((_, index) => (
-                  <Box key={index}>
-                    <ButtonStyled component='label' variant='text'>
-                      <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
-                      <input
-                        hidden
-                        disabled={formDisabled}
-                        type='file'
-                        onChange={e => {
-                          const file = e.target.files[0]
-                          setSelectedImages(prevImages => [...prevImages, file])
-                        }}
-                        id={`image${index + 1}`}
-                      />
-                      <Button
-                            size='small'
-                            color='error'
-                            disabled={formDisabled}
-                            onClick={() => {
-                              setSelectedImages(prevImages =>
-                                prevImages.map((image, i) => (i === index ? null : image))
-                              )
-                            }}
-                          >
-                            <CloseRoundedIcon />
-                          </Button>
+                {selectedImages &&
+                  selectedImages.map((_, index) => (
+                    <Box key={index}>
+                      <ButtonStyled component='label' variant='text'>
+                        <AddPhotoAlternateOutlinedIcon sx={{ width: '100px', height: '50px' }} />
+                        <input
+                          hidden
+                          disabled={formDisabled}
+                          type='file'
+                          onChange={e => {
+                            const file = e.target.files[0]
+                            setSelectedImages(prevImages => [...prevImages, file])
+                          }}
+                          id={`image${index + 1}`}
+                        />
+                        <Button
+                          size='small'
+                          color='error'
+                          disabled={formDisabled}
+                          onClick={() => {
+                            setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index))
+                          }}
+                        >
+                          <CloseRoundedIcon />
+                        </Button>
+                      </ButtonStyled>
+                    </Box>
+                  ))}
+                {maxImage && (
+                  <Box>
+                    <ButtonStyled variant='text' onClick={handleAddMoreImages} disabled={formDisabled}>
+                      <AddRoundedIcon sx={{ width: '100px', height: '50px' }} />
+                      Add Image
                     </ButtonStyled>
+                    {/* Hidden file input triggered by the Add More button */}
+                    <input
+                      hidden
+                      type='file'
+                      id='imageInput'
+                      onChange={e => {
+                        const file = e.target.files[0]
+                        setSelectedImages(prevImages => [...prevImages, file])
+                      }}
+                    />
                   </Box>
-                ))}
-                {/* Add More button */}
-                <Box>
-                  <ButtonStyled variant='text' onClick={handleAddMoreImages} disabled={formDisabled}>
-                    <AddRoundedIcon sx={{ width: '100px', height: '50px' }} />
-                    Add Image
-                  </ButtonStyled>
-                  {/* Hidden file input triggered by the Add More button */}
-                  <input
-                    hidden
-                    type='file'
-                    id='imageInput'
-                    onChange={e => {
-                      const file = e.target.files[0]
-                      setSelectedImages(prevImages => [...prevImages, file])
-                    }}
-                  />
-                </Box>
+                )}
               </Box>
             </Grid>
             <Grid item xs={12}>
