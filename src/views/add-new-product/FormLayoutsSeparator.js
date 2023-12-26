@@ -282,7 +282,7 @@ const FormLayoutsSeparator = () => {
                           <img
                             src={URL.createObjectURL(image)}
                             alt={`Selected Image ${index + 1}`}
-                            style={{ width: '50px', height: '50px', marginRight: '8px', borderRadius: '5px' }}
+                            style={{ width: '60px', height: '60px', marginRight: '8px', borderRadius: '5px' }}
                           />
                         )}
                         <input
