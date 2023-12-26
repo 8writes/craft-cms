@@ -273,12 +273,12 @@ const FormLayoutsSeparator = () => {
               </Typography>
             </Grid>
             <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
                 {selectedImages &&
                   selectedImages.map((_, index) => (
                     <Box key={index}>
                       <ButtonStyled component='label' variant='text'>
-                        <AddPhotoAlternateOutlinedIcon sx={{ width: '75px', height: '50px' }} />
+                        <AddPhotoAlternateOutlinedIcon sx={{ width: '50px', height: '50px' }} />
                         <input
                           hidden
                           disabled={formDisabled}
