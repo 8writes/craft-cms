@@ -54,8 +54,9 @@ const TableStickyHeader = () => {
   const userData = useUser()
   const [success, setSuccess] = useState('')
   const [failed, setFailed] = useState('')
-  const [suspense, setSuspense] = useState(true)
+  const [suspense, setSuspense] = useState('')
   const [isLoading, setIsLoading] = useState('')
+   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
 
   // ** States
   const [page, setPage] = useState(0)
@@ -65,6 +66,7 @@ const TableStickyHeader = () => {
   const [editProductId, setEditProductId] = useState(null)
   const [editPrice, setEditPrice] = useState(0)
   const [editStock, setEditStock] = useState(0)
+  const [imageUrls, setImageUrl] = useState([])
 
   useEffect(() => {
     const getUser = async () => {
@@ -102,9 +104,12 @@ const TableStickyHeader = () => {
       const formattedData = data.map(item => ({
         ...item,
         sn: ++idCounter,
-        image: item.uploadedImageUrl1
+        image: item.uploadedImageUrls // Assuming uploadedImageUrls is an array of image URLs
       }))
 
+      const urls = data[0]?.uploadedImageUrls
+
+      setImageUrl(urls)
       setTableData(formattedData)
     } catch (error) {
       console.error('Error fetching data:', error.message)
@@ -113,25 +118,16 @@ const TableStickyHeader = () => {
     }
   }
 
-  const deleteImage = async id => {
+  const deleteImage = async () => {
     try {
-      // Get all image URLs from the data based on the id
-      const imageUrls = [
-        tableData.find(item => item.id === id)?.uploadedImageUrl1,
-        tableData.find(item => item.id === id)?.uploadedImageUrl2,
-        tableData.find(item => item.id === id)?.uploadedImageUrl3
-      ].filter(Boolean)
-
-      // Remove the first segment from each image URL
+      // Modify the URLs to remove the dynamic part before the first "/"
       const modifiedUrls = imageUrls.map(url => {
-        const segments = url.split('/')
-        segments.shift() // Remove the first segment
+        const firstSlashIndex = url.indexOf('/')
 
-        return segments.join('/')
+        return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url
       })
 
-      // Remove images from Supabase storage using prefixes
-      const { data, error } = await supabase.storage.from(`${storeName}`).remove(modifiedUrls)
+      const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls)
 
       if (error) {
         console.log('send error to support:', error.message)
@@ -142,7 +138,8 @@ const TableStickyHeader = () => {
   }
 
   const handleDelete = async id => {
-    await deleteImage(id)
+    await deleteImage()
+    setDeleteLoadingId(id)
 
     try {
       const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id)
@@ -154,10 +151,12 @@ const TableStickyHeader = () => {
         setSuccess('Product deleted successfully!')
       }
 
-      await fetchData()
     } catch (error) {
-       setFailed(error.message)
+      setFailed(error.message)
     } finally {
+       setDeleteLoadingId(null)
+      fetchData()
+     
       // Reset success and failure after a delay
       setTimeout(() => {
         setSuccess('')
@@ -239,64 +238,79 @@ const TableStickyHeader = () => {
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
-              <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
+          {suspense ? (
+            <TableBody>
+              <TableRow>
                 {columns.map(column => (
-                  <TableCell key={column.id} align={column.align}>
-                    {column.id === 'image' ? (
-                      <img
-                        src={`https://hymcbwrcksuwhtfstztz.supabase.co/storage/v1/object/public/${row[column.id]}`}
-                        alt={`Product ${row.sn} Image`}
-                        style={{ width: '60px', height: '50px', borderRadius: '5px' }}
-                      />
-                    ) : column.id === 'size' ? (
-                      row[column.id].map((size, index) => (
-                        <span key={index}>
-                          {size}
-                          {index < row[column.id].length - 1 && ', '}
-                        </span>
-                      ))
-                    ) : column.format && typeof row[column.id] === 'number' ? (
-                      column.format(row[column.id])
-                    ) : (
-                      row[column.id]
-                    )}
+                  <TableCell key={column.id}>
+                    <Skeleton animation='wave' />
                   </TableCell>
                 ))}
                 <TableCell>
-                  <LoadingButton
-                    sx={{ m: 1, width: '100%'}}
-                    size='small'
-                    variant='outlined'
-                    onClick={() => handleEdit(row.id, row.price, row.stock)}
-                  >
-                    Edit
-                  </LoadingButton>
-                  <LoadingButton  sx={{ m: 1, width: '100%'}} size='small' variant='outlined' onClick={() => handleDelete(row.id)}>
-                    Delete
-                  </LoadingButton>
+                  <Skeleton animation='wave' />
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
+            </TableBody>
+          ) : (
+            <>
+              <TableBody>
+                {tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
+                  <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
+                    {columns.map(column => (
+                      <TableCell key={column.id} align={column.align}>
+                        {column.id === 'image' ? (
+                          <img
+                            src={`https://hymcbwrcksuwhtfstztz.supabase.co/storage/v1/object/public/${row.image[0]}`}
+                            alt={`Product ${row.sn} Image`}
+                            style={{ width: '60px', height: '50px', borderRadius: '5px' }}
+                          />
+                        ) : column.id === 'size' ? (
+                          row[column.id].map((size, index) => (
+                            <span key={index}>
+                              {size}
+                              {index < row[column.id].length - 1 && ', '}
+                            </span>
+                          ))
+                        ) : column.format && typeof row[column.id] === 'number' ? (
+                          column.format(row[column.id])
+                        ) : (
+                          row[column.id]
+                        )}
+                      </TableCell>
+                    ))}
+                    <TableCell>
+                      <LoadingButton
+                        sx={{ m: 1, width: '100%' }}
+                        size='small'
+                        variant='outlined'
+                        onClick={() => handleEdit(row.id, row.price, row.stock)}
+                       
+                      >
+                        Edit
+                      </LoadingButton>
+                      <LoadingButton
+                        sx={{ m: 1, width: '100%' }}
+                        size='small'
+                        variant='outlined'
+                        onClick={() => handleDelete(row.id)}
+                       loading={Boolean(deleteLoadingId === row.id)}
+                      >
+                        Delete
+                      </LoadingButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </>
+          )}
         </Table>
-        {suspense ? (
-          <div className='px-4'>
-              <Skeleton animation='wave' height={80} />
-              <Skeleton animation='wave' height={80} />
-              <Skeleton animation='wave' height={80} />
+
+        {tableData.length === 0 && !suspense && (
+          <div className='text-center my-10'>
+            <Typography variant='h4' className='text-slate-100'>
+              No products yet.
+            </Typography>
           </div>
-        ) : (
-          <>
-            {tableData.length === 0 && (
-              <div className='text-center my-10'>
-                <Typography variant='h4' className='text-slate-100'>
-                  No products yet.
-                </Typography>
-              </div>
-            )}
-          </>
         )}
       </TableContainer>
 
