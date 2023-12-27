@@ -34,16 +34,15 @@ let idCounter = 0
 
 const columns = [
   { id: 'sn', label: 'S/N' },
-  { id: 'image', label: 'Preview' },
-  { id: 'name', label: 'Product Name' },
-  { id: 'size', label: 'Size' },
+  { id: 'fullName', label: 'Name' },
+  { id: 'reference', label: 'Reference ID' },
   {
-    id: 'date',
+    id: 'orderDate',
     label: 'Date'
   },
-  { id: 'stock', label: 'Inventory' },{
+  {
     id: 'price',
-    label: 'Price (₦)',
+    label: 'Amount(₦)',
     format: value => value.toLocaleString('en-US')
   },
   { id: 'status', label: 'Status' },
@@ -78,10 +77,9 @@ const TableStickyHeader = () => {
         console.error('Error getting user:', e)
       }
     }
-    getUser()
-    const storeName = userData?.user_metadata?.store_name
 
-    if (storeName) {
+    if (userData?.user_metadata?.store_name) {
+      getUser()
       fetchData()
     }
   }, [userData?.user_metadata?.store_name])
@@ -91,7 +89,7 @@ const TableStickyHeader = () => {
   const fetchData = async () => {
     setSuspense(true)
     try {
-      const { data, error } = await supabase.from(`${storeOrders}`).select()
+      const { data, error } = await supabase.from('royeshoesOrders').select()
 
       if (error) {
         throw error
@@ -104,7 +102,7 @@ const TableStickyHeader = () => {
       const formattedData = data.map(item => ({
         ...item,
         sn: ++idCounter,
-        image: item.uploadedImageUrls // Assuming uploadedImageUrls is an array of image URLs
+        image: item.uploadedImageUrl // Assuming uploadedImageUrls is an array of image URLs
       }))
 
       const urls = data[0]?.uploadedImageUrls
@@ -257,24 +255,16 @@ const TableStickyHeader = () => {
                   <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
                     {columns.map(column => (
                       <TableCell key={column.id} align={column.align}>
-                        {column.id === 'image' ? (
-                          <img
-                            src={`https://hymcbwrcksuwhtfstztz.supabase.co/storage/v1/object/public/${row.image[0]}`}
-                            alt={`Product ${row.sn} Image`}
-                            style={{ width: '60px', height: '50px', borderRadius: '5px' }}
-                          />
-                        ) : column.id === 'size' ? (
-                          row[column.id].map((size, index) => (
-                            <span key={index}>
-                              {size}
-                              {index < row[column.id].length - 1 && ', '}
-                            </span>
-                          ))
-                        ) : column.format && typeof row[column.id] === 'number' ? (
-                          column.format(row[column.id])
-                        ) : (
-                          row[column.id]
-                        )}
+                        {column.id === 'size' && Array.isArray(row[column.id])
+                          ? row[column.id].map((size, index) => (
+                              <span key={index}>
+                                {size}
+                                {index < row[column.id].length - 1 && ', '}
+                              </span>
+                            ))
+                          : column.format && typeof row[column.id] === 'number'
+                          ? column.format(row[column.id])
+                          : row[column.id]}
                       </TableCell>
                     ))}
                     <TableCell>

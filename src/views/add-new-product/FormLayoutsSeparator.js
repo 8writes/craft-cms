@@ -21,11 +21,9 @@ import AlertTitle from '@mui/material/AlertTitle'
 import { useUser } from 'src/@core/context/userDataContext'
 import Link from 'next/link'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import DoneAllRoundedIcon from '@mui/icons-material/DoneAllRounded'
-
+ 
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
