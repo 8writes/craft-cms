@@ -59,7 +59,6 @@ const FormLayoutsSeparator = () => {
   const [formDisabled, setFormDisabled] = useState(false)
   const [productSizes, setProductSizes] = useState([])
   const [selectedImages, setSelectedImages] = useState([])
-  const [maxImage, setMaxImage] = useState(false)
 
   const MAX_IMAGES = 4 // Maximum number of images allowed
 
@@ -69,7 +68,7 @@ const FormLayoutsSeparator = () => {
     !productName || !productDescription || !productStock || !sellingPrice || !productTag || selectedImages.length === 0
 
   // Function to handle size change
-  const handleSizeChange = (index, value) => {
+  const handleSizeChange = (index, value) => { 
     const newSizes = [...productSizes]
     newSizes[index] = value
     setProductSizes(newSizes)

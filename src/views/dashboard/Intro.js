@@ -100,7 +100,7 @@ const Trophy = () => {
         </Grid>
       )}
       <CardContent>
-        {userData ? ( <><Typography variant='h5'>Welcome,  {userFirstName}</Typography></> ) : (<><Skeleton animation="wave" height={30} width={200}/></>)} 
+        {userData ? ( <><Typography variant='h5'>Welcome  {userFirstName}</Typography></> ) : (<><Skeleton animation="wave" height={30} width={200}/></>)} 
         {userData ? (
           <>
             <Typography variant='h6'></Typography>
@@ -117,7 +117,7 @@ const Trophy = () => {
         {userStatus ? (
           <>
              <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
-              Your store is Activated &#127881;
+              Your store is Activated 
             </Typography>
             <Link href='/add-new-product' passHref>
               <Button size='medium' variant='outlined'>

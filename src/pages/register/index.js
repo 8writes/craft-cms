@@ -116,7 +116,10 @@ const RegisterPage = () => {
             first_name: firstName,
             last_name: lastName,
             store_name: storeName,
-            subscription: 'Free Plan'
+            subscription: 'Basic',
+            storage: false,
+            role: 'basic',
+            store_orders: `${storeName}Orders`,
           }
         }
       })

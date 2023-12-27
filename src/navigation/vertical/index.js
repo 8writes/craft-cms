@@ -32,7 +32,7 @@ const navigation = () => {
     {
       icon: ListAltRoundedIcon,
       title: 'Orders',
-      path: '#'
+      path: '/orders'
     },
     {
       sectionTitle: 'User Account'

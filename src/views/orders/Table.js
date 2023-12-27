@@ -21,9 +21,9 @@ import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
 
 import { useUser } from 'src/@core/context/userDataContext'
-import IntroHeading from './IntroHeading'
 
 import { createClient } from '@supabase/supabase-js'
+import IntroHeading from './Header'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -41,12 +41,12 @@ const columns = [
     id: 'date',
     label: 'Date'
   },
-  {
+  { id: 'stock', label: 'Inventory' },{
     id: 'price',
     label: 'Price (₦)',
     format: value => value.toLocaleString('en-US')
   },
-  { id: 'stock', label: 'Inventory' },
+  { id: 'status', label: 'Status' },
   { id: 'action', label: '' }
 ]
 
@@ -56,7 +56,7 @@ const TableStickyHeader = () => {
   const [failed, setFailed] = useState('')
   const [suspense, setSuspense] = useState('')
   const [isLoading, setIsLoading] = useState('')
-   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null)
 
   // ** States
   const [page, setPage] = useState(0)
@@ -86,12 +86,12 @@ const TableStickyHeader = () => {
     }
   }, [userData?.user_metadata?.store_name])
 
-  const storeName = userData?.user_metadata?.store_name
+  const storeOrders = userData?.user_metadata?.store_orders
 
   const fetchData = async () => {
     setSuspense(true)
     try {
-      const { data, error } = await supabase.from(`${storeName}`).select()
+      const { data, error } = await supabase.from(`${storeOrders}`).select()
 
       if (error) {
         throw error
@@ -150,13 +150,12 @@ const TableStickyHeader = () => {
         setFailed('')
         setSuccess('Product deleted successfully!')
       }
-
     } catch (error) {
       setFailed(error.message)
     } finally {
-       setDeleteLoadingId(null)
+      setDeleteLoadingId(null)
       fetchData()
-     
+
       // Reset success and failure after a delay
       setTimeout(() => {
         setSuccess('')
@@ -284,7 +283,6 @@ const TableStickyHeader = () => {
                         size='small'
                         variant='outlined'
                         onClick={() => handleEdit(row.id, row.price, row.stock)}
-                       
                       >
                         Edit
                       </LoadingButton>
@@ -293,7 +291,7 @@ const TableStickyHeader = () => {
                         size='small'
                         variant='outlined'
                         onClick={() => handleDelete(row.id)}
-                       loading={Boolean(deleteLoadingId === row.id)}
+                        loading={Boolean(deleteLoadingId === row.id)}
                       >
                         Delete
                       </LoadingButton>
@@ -308,7 +306,7 @@ const TableStickyHeader = () => {
         {tableData.length === 0 && !suspense && (
           <div className='text-center my-10'>
             <Typography variant='h4' className='text-slate-100'>
-              No products yet.
+              No orders yet.
             </Typography>
           </div>
         )}

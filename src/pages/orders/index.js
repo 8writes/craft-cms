@@ -1,12 +1,10 @@
-// ** React Imports
-import { useState } from 'react'
 
 // ** MUI Imports
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
 
 // ** Demo Components Imports
-import TableStickyHeader from 'src/views/all-products/Table'
+import TableStickyHeader from 'src/views/orders/Table'
 
 // ** Third Party Styles Imports
 import 'react-datepicker/dist/react-datepicker.css'
