@@ -367,7 +367,7 @@ const FormLayoutsSeparator = () => {
                 name='sellingPrice'
                 type='tel'
                 disabled={formDisabled}
-                 value={sellingPrice.toLocaleString('en-US')}
+                value={sellingPrice}
                 onChange={e => setSellingPrice(e.target.value)}
               />
             </Grid>
