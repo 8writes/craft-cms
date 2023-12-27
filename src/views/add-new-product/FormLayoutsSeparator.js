@@ -365,11 +365,9 @@ const FormLayoutsSeparator = () => {
                 placeholder='e.g., 50000'
                 id='sellingPrice'
                 name='sellingPrice'
-                type='number'
-                pattern='\d*'
-                inputMode='numeric'
+                type='tel'
                 disabled={formDisabled}
-                value={sellingPrice}
+                 value={sellingPrice.toLocaleString('en-US')}
                 onChange={e => setSellingPrice(e.target.value)}
               />
             </Grid>
@@ -422,6 +420,7 @@ const FormLayoutsSeparator = () => {
                 <div className='flex items-center my-1' key={index}>
                   <TextField
                     fullWidth
+                    type='text'
                     label={`Product Size`}
                     placeholder={`e.g., 36/XL`}
                     value={size}
