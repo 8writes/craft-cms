@@ -309,7 +309,7 @@ const FormLayoutsSeparator = () => {
                   ))}
                 <Box>
                   <ButtonStyled variant='text' onClick={handleAddMoreImages} disabled={formDisabled}>
-                    <AddRoundedIcon sx={{ width: '100px', height: '50px' }} />
+                    <AddRoundedIcon sx={{ width: '50px', height: '50px' }} />
                     Add Image
                   </ButtonStyled>
                   <input
