@@ -65,7 +65,7 @@ const FormLayoutsSeparator = () => {
   const isMounted = useRef(true)
 
   const isDisabled =
-    !productName || !productDescription || !productStock || !sellingPrice || !productTag || selectedImages.length === 0
+    !productName || !productDescription || !productStock || !sellingPrice || !productTag || selectedImages.length === 0 || productSizes.length === 0
 
   // Function to handle size change
   const handleSizeChange = (index, value) => { 
