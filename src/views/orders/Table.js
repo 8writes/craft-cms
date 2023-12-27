@@ -44,6 +44,9 @@ const columns = [
     id: 'price',
     label: 'Amount(₦)',
     format: value => value.toLocaleString('en-US')
+  },{
+    id: 'email',
+    label: 'Email Address'
   },
   { id: 'status', label: 'Status' },
   { id: 'action', label: '' }
