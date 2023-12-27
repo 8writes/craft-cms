@@ -116,31 +116,11 @@ const TableStickyHeader = () => {
     }
   }
 
-  const deleteImage = async () => {
-    try {
-      // Modify the URLs to remove the dynamic part before the first "/"
-      const modifiedUrls = imageUrls.map(url => {
-        const firstSlashIndex = url.indexOf('/')
-
-        return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url
-      })
-
-      const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls)
-
-      if (error) {
-        console.log('send error to support:', error.message)
-      }
-    } catch (error) {
-      console.error('Error deleting images:', error.message)
-    }
-  }
-
   const handleDelete = async id => {
-    await deleteImage()
     setDeleteLoadingId(id)
 
     try {
-      const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id)
+      const { error } = await supabase.from('royeshoesOrders').delete().eq('user_id', userId).eq('id', id)
 
       if (error) {
         setFailed(error.message)
