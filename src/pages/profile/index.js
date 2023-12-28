@@ -12,14 +12,15 @@ import MuiTab from '@mui/material/Tab'
 
 // ** Icons Imports
 import AccountOutline from 'mdi-material-ui/AccountOutline'
-import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded';
-import ReceiptRoundedIcon from '@mui/icons-material/ReceiptRounded';
+import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded'
+import ReceiptRoundedIcon from '@mui/icons-material/ReceiptRounded'
 
 // ** Demo Tabs Imports
 import TabAccount from 'src/views/account-settings/TabProfile'
 
 // ** Third Party Styles Imports
 import 'react-datepicker/dist/react-datepicker.css'
+import TabSubscription from 'src/views/account-settings/TabSubscription'
 
 const Tab = styled(MuiTab)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -72,7 +73,8 @@ const Profile = () => {
                 <TabName>Subscription</TabName>
               </Box>
             }
-          /><Tab
+          />
+          <Tab
             value='invoice'
             label={
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -85,6 +87,9 @@ const Profile = () => {
 
         <TabPanel sx={{ p: 0 }} value='account'>
           <TabAccount />
+        </TabPanel>
+        <TabPanel sx={{ p: 0 }} value='subscription'>
+          <TabSubscription />
         </TabPanel>
       </TabContext>
     </Card>
