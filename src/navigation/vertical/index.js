@@ -5,6 +5,7 @@ import CogOutline from 'mdi-material-ui/CogOutline'
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import ListAltRoundedIcon from '@mui/icons-material/ListAltRounded'
 import LiveHelpRoundedIcon from '@mui/icons-material/LiveHelpRounded'
+import QueryStatsRoundedIcon from '@mui/icons-material/QueryStatsRounded';
 import AddIcon from '@mui/icons-material/Add';
 
 const navigation = () => {
@@ -34,12 +35,17 @@ const navigation = () => {
       title: 'Orders',
       path: '/orders'
     },
+     {
+      icon: QueryStatsRoundedIcon,
+      title: 'Statistics',
+      path: '#'
+    },
     {
       sectionTitle: 'User Account'
     },
     {
       icon: AccountOutline,
-      title: 'Profile',
+      title: 'Account',
       path: '/profile'
     },
     {

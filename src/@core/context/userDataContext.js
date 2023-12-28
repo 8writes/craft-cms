@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import Cookies from 'js-cookie'
 import { useRouter } from 'next/router'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL

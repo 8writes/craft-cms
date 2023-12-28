@@ -284,14 +284,14 @@ const TableStickyHeader = () => {
                             alt={`Product ${row.sn} Image`}
                             style={{ width: '60px', height: '50px', borderRadius: '5px' }}
                           />
-                        ) : column.id === 'size' ? (
-                          row[column.id].map((size, index) => (
-                            <span key={index}>
-                              {size}
-                              {index < row[column.id].length - 1 && ', '}
-                            </span>
-                          ))
-                        ) : column.format && typeof row[column.id] === 'number' ? (
+                          ) : column.id === 'size' ? (
+                            row[column.id].map((size, index) => (
+                              <span key={index}>
+                                {size}
+                                {index < row[column.id].length - 1 && ', '}
+                              </span>
+                            ))
+                          ) : column.format && typeof row[column.id] === 'number' ? (
                           column.format(row[column.id])
                         ) : (
                           row[column.id]
@@ -311,7 +311,7 @@ const TableStickyHeader = () => {
                         anchorEl={anchorEl}
                         onClose={handlePopoverClose}
                         anchorOrigin={{
-                          vertical: 'bottom',
+                          vertical: 'top',
                           horizontal: 'center',
                         }}
                         transformOrigin={{

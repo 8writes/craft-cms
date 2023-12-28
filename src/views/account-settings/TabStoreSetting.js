@@ -29,6 +29,7 @@ const StoreSetting = () => {
   const storeName = userData?.user_metadata?.store_name
   const userId = userData?.id
   const userStatus = userData?.user_metadata?.storage
+  const storeOrders = userData?.user_metadata?.store_orders
 
   
  const handleStorage = async () => {
@@ -97,7 +98,12 @@ const StoreSetting = () => {
           <Grid container spacing={7} sx={{ marginTop: 1 }}>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth label='Store Name' defaultValue={storeName ? storeName.toUpperCase() : ''} disabled />
-            </Grid>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+              <TextField fullWidth label='Store OrderID' defaultValue={storeOrders ? storeOrders.toUpperCase() : ''} disabled />
+              </Grid>
+
+
             {userStatus ? (<Grid item xs={12} sx={{ mt: 5 }}>
               <Alert severity='success' sx={{ '& a': { fontWeight: 400 } }}>
                 <AlertTitle>Your store is activated!</AlertTitle>

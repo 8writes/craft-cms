@@ -12,6 +12,8 @@ import MuiTab from '@mui/material/Tab'
 
 // ** Icons Imports
 import AccountOutline from 'mdi-material-ui/AccountOutline'
+import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded';
+import ReceiptRoundedIcon from '@mui/icons-material/ReceiptRounded';
 
 // ** Demo Tabs Imports
 import TabAccount from 'src/views/account-settings/TabProfile'
@@ -58,7 +60,24 @@ const Profile = () => {
             label={
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <AccountOutline />
-                <TabName>My Profile</TabName>
+                <TabName>Profile</TabName>
+              </Box>
+            }
+          />
+          <Tab
+            value='subscription'
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <AccountBalanceRoundedIcon />
+                <TabName>Subscription</TabName>
+              </Box>
+            }
+          /><Tab
+            value='invoice'
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <ReceiptRoundedIcon />
+                <TabName>Invoice</TabName>
               </Box>
             }
           />
