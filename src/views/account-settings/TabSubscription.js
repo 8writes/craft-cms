@@ -118,7 +118,7 @@ const TabSubscription = () => {
               onClick={closePopupAndUpgrade}
               className='paystack-button text-white font-bold py-2 px-4 rounded'
             >
-              Confirm and Upgrade
+              Upgrade Plan
             </Button>
           </DialogActions>
         </Dialog>
