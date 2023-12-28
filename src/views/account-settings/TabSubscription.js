@@ -89,13 +89,10 @@ const TabSubscription = () => {
 
         {/* Dialog for displaying subscription details */}
         <Dialog open={isPopupOpen} onClose={() => setIsPopupOpen(false)}>
-                  <FormControl fullWidth>
-                      <DialogTitle>
-            
-              Subscription Details{' '}
-              <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setIsPopupOpen(false)} />
-           
-          </DialogTitle> </FormControl>
+          <DialogTitle className='flex justify-between items-center'>
+            Subscription Details
+            <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setIsPopupOpen(false)} />
+          </DialogTitle>
           <DialogContent>
             <FormControl fullWidth>
               <Typography variant='body1' gutterBottom>
