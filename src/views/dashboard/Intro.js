@@ -22,10 +22,11 @@ const TriangleImg = styled('img')({
   right: 0,
   bottom: 0,
   height: 170,
+  zIndex: -1,
   position: 'absolute'
 })
 
-const Trophy = () => {
+const Intro = () => {
   const userData = useUser()
   const [isLoading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
@@ -115,16 +116,14 @@ const Trophy = () => {
         )}
         {userData ? (<>
         {userStatus ? (
-          <>
-             <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
-              Your store is Activated 
-            </Typography>
-            <Link href='/add-new-product' passHref>
+          <div className='mt-5 flex justify-end '>
+            <Link href='/add-new-product' passHref >
               <Button size='medium' variant='outlined'>
                 Add New Product
               </Button>
             </Link>
-          </>
+            
+          </div>
         ) : (
           <>
             <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
@@ -150,4 +149,4 @@ const Trophy = () => {
   )
 }
 
-export default Trophy
+export default Intro
