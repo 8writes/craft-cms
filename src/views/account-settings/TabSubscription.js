@@ -15,8 +15,23 @@ import {
 } from '@mui/material'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 
+import { createClient } from '@supabase/supabase-js'
+import { useUser } from 'src/@core/context/userDataContext'
+import Link from 'next/link'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
 const TabSubscription = () => {
+  const userData = useUser()
   const [isPopupOpen, setIsPopupOpen] = useState(false)
+
+  const subscriptionValidity = userData?.user_metadata?.validity
+  const storeSubscription = userData?.user_metadata?.subscription
+  const subscriptionAmount = userData?.user_metadata?.sub_amount
+  const maxProducts = userData?.user_metadata?.max_product
 
   // Paystack configuration
   const paystackPublicKey = 'pk_test_990b84e62bcd13690d07272f933a2080b195ce10' // Replace with your Paystack public key
@@ -59,20 +74,20 @@ const TabSubscription = () => {
   }
 
   return (
-    <Card className='max-w-md'>
+    <Card>
       <CardContent>
         <Typography variant='h6' gutterBottom>
-          Subscription Plan: Free
+          Subscription Plan: {storeSubscription}
         </Typography>
         <Typography variant='body1' gutterBottom>
-          Amount: ₦0 (NGN)
+          Amount: ₦{subscriptionAmount} (NGN)
         </Typography>
         <Typography variant='body1' gutterBottom>
-          Valid for: Lifetime
+          Valid for: {subscriptionValidity}
         </Typography>
         <Divider />
         <Typography variant='body1' gutterBottom>
-          Max Product: 5
+          Max Products: {maxProducts}
         </Typography>
 
         <Box className='mt-5'>
@@ -106,20 +121,24 @@ const TabSubscription = () => {
               </Typography>
               <Divider />
               <Typography variant='body1' gutterBottom>
-                Max Product: 50
+                Max Products: 50
               </Typography>
             </FormControl>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{display: 'grid'}}>
             {/* Button to confirm and proceed with payment */}
             <Button
               variant='outlined'
               size='large'
               onClick={closePopupAndUpgrade}
+              disabled
               className='paystack-button text-white font-bold py-2 px-4 rounded'
             >
               Upgrade Plan
             </Button>
+            <Typography variant='body1' sx={{margin: '5px'}} gutterBottom>
+              Contact <Link href='#' passHref><span className='underline cursor-pointer'>support</span></Link> to upgrade
+            </Typography>
           </DialogActions>
         </Dialog>
       </CardContent>

@@ -95,6 +95,7 @@ const FormLayoutsSeparator = () => {
       try {
         const { data } = await supabase.auth.getUser()
         const userId = data?.user?.id || ''
+        
         setUserId(userId)
       } catch (e) {
         console.error('Error getting user:', e)
@@ -105,6 +106,7 @@ const FormLayoutsSeparator = () => {
 
   const emailAddress = userData?.email
   const storeName = userData?.user_metadata?.store_name
+  const subscription = userData?.user_metadata?.subscription
 
   const uploadImage = async index => {
     try {
@@ -177,30 +179,62 @@ const FormLayoutsSeparator = () => {
     }
   }
 
-  // Function to handle the overall upload process
-  const handleUpload = async () => {
-    setLoading(true)
-    setFormDisabled(true)
+ // Function to handle the overall upload process
+const handleUpload = async () => {
+  setLoading(true);
+  setFormDisabled(true);
 
-    try {
-      await handleUploadForm()
-    } catch (error) {
-      console.error('An unexpected error occurred:', error.message)
+  try {
+    // Fetch user information including max_product
+    const { data, error } = await supabase.auth.getUser();
 
-      // Return null or handle error as needed
-      isMounted.current = false
-    } finally {
-      // Reset success and failure after a delay
-      setTimeout(() => {
-        setSuccess('')
-      }, 9000)
-
-      clearForm()
-
-      setFormDisabled(false)
-      setLoading(false)
+    if (error) {
+      throw new Error(error.message);
     }
+
+    const maxProduct = data?.user?.user_metadata?.max_product || 5;
+
+    // Fetch subscription limit based on subscription type
+    let subscriptionLimit;
+    switch (subscription) {
+      case 'free':
+        subscriptionLimit = 5;
+        break;
+      case 'basic':
+        subscriptionLimit = 50;
+        break;
+      case 'premium':
+        subscriptionLimit = 100;
+        break;
+      default:
+        subscriptionLimit = 5; // Default to free subscription
+        break;
+    }
+
+    // Check if the user has reached the subscription limit
+    if (maxProduct >= subscriptionLimit) {
+      setFailed(`You have reached the maximum of ${maxProduct} limit for your subscription .`);
+
+      return;
+    }
+
+    // Proceed with the product upload
+
+    await handleUploadForm();
+  } catch (error) {
+    console.error('An unexpected error occurred:', error.message);
+  } finally {
+    // Reset success and failure after a delay
+    setTimeout(() => {
+      setSuccess('');
+    }, 9000);
+
+    clearForm();
+
+    setFormDisabled(false);
+    setLoading(false);
   }
+};
 
   // Function to clear form fields
   const clearForm = () => {

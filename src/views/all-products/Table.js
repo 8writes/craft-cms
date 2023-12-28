@@ -166,6 +166,8 @@ const TableStickyHeader = () => {
         setFailed('');
         setSuccess('Product deleted successfully!');
       }
+      setEditProductId(null);
+      setAnchorEl(null);
     } catch (error) {
       setFailed('Network error');
     } finally {

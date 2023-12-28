@@ -88,12 +88,12 @@ const TableStickyHeader = () => {
     }
   }, [userData?.user_metadata?.store_name])
 
-  const storeName = userData?.user_metadata?.store_name
+  const storeOrderId = userData?.user_metadata?.store_orderId
 
   const fetchData = async () => {
     setSuspense(true)
     try {
-      const { data, error } = await supabase.from('royeshoesOrders').select()
+      const { data, error } = await supabase.from(`${storeOrderId}`).select()
 
       if (error) {
         throw error
@@ -116,65 +116,64 @@ const TableStickyHeader = () => {
     }
   }
 
-  const handleDelete = async id => {
-    setDeleteLoadingId(id)
+const handleDelete = async id => {
+  setDeleteLoadingId(id);
 
-    try {
-      const { error } = await supabase.from('royeshoesOrders').delete().eq('user_id', userId).eq('id', id)
+  try {
+    const { error } = await supabase.from(`${storeOrderId}`).delete().eq('id', id);
 
-      if (error) {
-        setFailed(error.message)
-      } else {
-        setFailed('')
-        setSuccess('Order deleted successfully!')
-      }
-    } catch (error) {
-      console.error(error)
-      setFailed('Network error')
-    } finally {
-      setDeleteLoadingId(null)
-      fetchData()
-
-      setTimeout(() => {
-        setSuccess('')
-      }, 3000)
+    if (error) {
+      throw error;
     }
-  }
 
-  const handleEdit = (id, status) => {
+    setSuccess('Order deleted successfully!');
+  } catch (error) {
+    console.error(error);
+    setFailed(error.message || 'Error deleting order.');
+  } finally {
+    setDeleteLoadingId(null);
+    setAnchorEl(null);
+    fetchData(); // Refetch data after deletion
+
+    setTimeout(() => {
+      setSuccess('');
+    }, 3000);
+  }
+};
+
+  const handleEdit = (id) => {
     setEditOrderId(id)
   }
 
-  const handleSaveEdit = async () => {
-    setIsLoading(true)
-    try {
-      const { error } = await supabase
-        .from('royeshoesOrders')
-        .update({ status: editOrderStatus })
-        .eq('user_id', userId)
-        .eq('id', editOrderId)
+const handleSaveEdit = async () => {
+  setIsLoading(true);
 
-      if (error) {
-        setFailed(error.message)
-      } else {
-        setFailed('')
-        setSuccess('Order updated successfully!')
-      }
+  try {
+    const { error } = await supabase
+      .from(`${storeOrderId}`)
+      .update({ status: editOrderStatus })
+      .eq('id', editOrderId);
 
-      await fetchData()
-      setEditOrderId(null)
-      setAnchorEl(null)
-    } catch (error) {
-      console.error(error)
-      setFailed(error)
-    } finally {
-      setIsLoading(false)
-
-      setTimeout(() => {
-        setSuccess('')
-      }, 3000)
+    if (error) {
+      throw error;
     }
+
+    setSuccess('Order updated successfully!');
+    setFailed('');
+    await fetchData();
+    setEditOrderId(null);
+    setAnchorEl(null);
+  } catch (error) {
+    console.error(error);
+    setFailed(error.message || 'Error updating order.');
+  } finally {
+    setIsLoading(false);
+
+    setTimeout(() => {
+      setSuccess('');
+    }, 3000);
   }
+};
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage)

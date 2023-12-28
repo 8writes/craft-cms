@@ -29,7 +29,7 @@ const StoreSetting = () => {
   const storeName = userData?.user_metadata?.store_name
   const userId = userData?.id
   const userStatus = userData?.user_metadata?.storage
-  const storeOrders = userData?.user_metadata?.store_orders
+  const storeOrders = userData?.user_metadata?.store_orderId
 
   
  const handleStorage = async () => {

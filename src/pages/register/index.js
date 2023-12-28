@@ -77,7 +77,7 @@ const RegisterPage = () => {
   const [checkbox, setCheckbox] = useState(false)
   const [passwordError, setPasswordError] = useState('')
 
-  const isDisabled = !email || !password || !firstName || !lastName || !checkbox || !storeName
+  const isDisabled = !email || !password || !firstName || !lastName || !checkbox || !storeName || !!passwordError;
 
   const handleCheckboxChange = e => {
     setCheckbox(e.target.checked)
@@ -116,10 +116,12 @@ const RegisterPage = () => {
             first_name: firstName,
             last_name: lastName,
             store_name: storeName,
-            subscription: 'Basic',
+            subscription: 'Free',
+            sub_amount: '0',
+            validity: 'Lifetime',
+            max_product: '5',
             storage: false,
-            role: 'basic',
-            store_orders: `${storeName}Orders`,
+            store_orderId: `${storeName}Orders`,
           }
         }
       })

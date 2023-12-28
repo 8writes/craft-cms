@@ -34,6 +34,7 @@ const TabProfile = () => {
 
   const userFirstName = userData?.user_metadata?.first_name
   const userLastName = userData?.user_metadata?.last_name
+  const subscription = userData?.user_metadata?.subscription
   const createdAt = userData?.created_at
  const oldEmail = userData?.email;
 const changeEmail = userData?.email_change;
@@ -59,7 +60,8 @@ const changeEmail = userData?.email_change;
   setTimeout(() => {
     setSuccess('')
   }, 2000)
-}
+ }
+  
   return (
     <CardContent>
       {success && (
@@ -136,7 +138,7 @@ const changeEmail = userData?.email_change;
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField fullWidth type='text' label='Subscription' defaultValue='Free Plan' disabled />
+              <TextField fullWidth type='text' label='Subscription' defaultValue={subscription} disabled />
             </Grid>
             {false ? (
               <Grid item xs={12} sx={{ mb: 3 }}>
