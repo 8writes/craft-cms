@@ -100,7 +100,7 @@ const Trophy = () => {
         </Grid>
       )}
       <CardContent>
-        {userData ? ( <><Typography variant='h5'>Welcome  {userFirstName}</Typography></> ) : (<><Skeleton animation="wave" height={30} width={200}/></>)} 
+        {userData ? ( <><Typography variant='h5'>Welcome,  {userFirstName}</Typography></> ) : (<><Skeleton animation="wave" height={30} width={200}/></>)} 
         {userData ? (
           <>
             <Typography variant='h6'></Typography>
