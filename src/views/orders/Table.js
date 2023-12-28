@@ -109,7 +109,8 @@ const TableStickyHeader = () => {
 
       setTableData(formattedData)
     } catch (error) {
-      console.error('Error fetching data:', error.message)
+      console.error(error)
+      setFailed(error)
     } finally {
       setSuspense(false)
     }
@@ -128,6 +129,7 @@ const TableStickyHeader = () => {
         setSuccess('Order deleted successfully!')
       }
     } catch (error) {
+      console.error(error)
       setFailed('Network error')
     } finally {
       setDeleteLoadingId(null)
@@ -155,6 +157,7 @@ const TableStickyHeader = () => {
       if (error) {
         setFailed(error.message)
       } else {
+        setFailed('')
         setSuccess('Order updated successfully!')
       }
 
@@ -162,7 +165,8 @@ const TableStickyHeader = () => {
       setEditOrderId(null)
       setAnchorEl(null)
     } catch (error) {
-      console.error('Error updating data:', error.message)
+      console.error(error)
+      setFailed(error)
     } finally {
       setIsLoading(false)
 
@@ -265,7 +269,7 @@ const TableStickyHeader = () => {
                           horizontal: 'center'
                         }}
                       >
-                        <MenuItem onClick={() => handleEdit(row.id, row.price, row.stock)}>Edit</MenuItem>
+                        <MenuItem onClick={() => handleEdit(row.id)}>Update</MenuItem>
                         <MenuItem onClick={() => handleDelete(row.id)} disabled={Boolean(deleteLoadingId === row.id)}>
                           Delete
                         </MenuItem>
@@ -305,7 +309,6 @@ const TableStickyHeader = () => {
                 value={editOrderStatus}
                 onChange={e => setEditOrderStatus(e.target.value)}
               >
-                <MenuItem value='In Progress'>In Progress</MenuItem>
                 <MenuItem value='Shipped'>Shipped</MenuItem>
                 <MenuItem value='Delivered'>Delivered</MenuItem>
                 <MenuItem value='Refunded'>Refunded</MenuItem>

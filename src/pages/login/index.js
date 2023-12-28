@@ -190,6 +190,7 @@ const LoginPage = () => {
               disabled={isDisabled}
               sx={{ marginBottom: 7 }}
               onClick={handleLogin}
+               autoFocus
             >
               Login
             </LoadingButton>

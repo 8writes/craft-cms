@@ -282,6 +282,7 @@ const RegisterPage = () => {
               disabled={isDisabled}
               variant='contained'
               sx={{ marginBottom: 7 }}
+              autoFocus
             >
               Sign up
             </LoadingButton>

@@ -350,12 +350,14 @@ const TableStickyHeader = () => {
         <DialogContent className='grid gap-5'>
           <Grid item xs={12} sm={3}></Grid>
           <Grid item xs={12} sm={3}>
+            <FormControl fullWidth>
             <TextField
               label='Price(₦)'
               type='number'
               value={editPrice}
               onChange={e => setEditPrice(e.target.value)}
-            />
+              />
+            </FormControl>
           </Grid>
           <Grid item xs={12} sm={3}>
             <FormControl fullWidth>
