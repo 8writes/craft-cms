@@ -1,7 +1,4 @@
-// ** React Imports
-import { useState, useEffect } from 'react'
-
-// ** MUI Imports
+import React, { useState, useEffect } from 'react'
 import Paper from '@mui/material/Paper'
 import Grid from '@mui/material/Grid'
 import Table from '@mui/material/Table'
@@ -18,12 +15,13 @@ import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import TextField from '@mui/material/TextField'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import Popover from '@mui/material/Popover'
 
 import { useUser } from 'src/@core/context/userDataContext'
+import IntroHeading from './Header'
 
 import { createClient } from '@supabase/supabase-js'
-import IntroHeading from './Header'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -36,18 +34,9 @@ const columns = [
   { id: 'sn', label: 'S/N' },
   { id: 'fullName', label: 'Name' },
   { id: 'reference', label: 'Reference ID' },
-  {
-    id: 'orderDate',
-    label: 'Date'
-  },
-  {
-    id: 'price',
-    label: 'Amount(₦)',
-    format: value => value.toLocaleString('en-US')
-  },{
-    id: 'email',
-    label: 'Email Address'
-  },
+  { id: 'orderDate', label: 'Date' },
+  { id: 'price', label: 'Amount(₦)', format: value => value.toLocaleString('en-US') },
+  { id: 'email', label: 'Email Address' },
   { id: 'status', label: 'Status' },
   { id: 'action', label: '' }
 ]
@@ -60,15 +49,27 @@ const TableStickyHeader = () => {
   const [isLoading, setIsLoading] = useState('')
   const [deleteLoadingId, setDeleteLoadingId] = useState(null)
 
-  // ** States
+  // States for edit functionality
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [tableData, setTableData] = useState([])
   const [userId, setUserId] = useState('')
-  const [editProductId, setEditProductId] = useState(null)
-  const [editPrice, setEditPrice] = useState(0)
-  const [editStock, setEditStock] = useState(0)
-  const [imageUrls, setImageUrl] = useState([])
+  const [editOrderId, setEditOrderId] = useState(0)
+  const [editOrderStatus, setEditOrderStatus] = useState('')
+
+  // States for popover
+  // States for popover
+  const [anchorEl, setAnchorEl] = useState(null)
+
+  // Function to handle the opening of the popover
+  const handlePopoverOpen = event => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  // Function to handle the closing of the popover
+  const handlePopoverClose = () => {
+    setAnchorEl(null)
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -87,7 +88,7 @@ const TableStickyHeader = () => {
     }
   }, [userData?.user_metadata?.store_name])
 
-  const storeOrders = userData?.user_metadata?.store_orders
+  const storeName = userData?.user_metadata?.store_name
 
   const fetchData = async () => {
     setSuspense(true)
@@ -98,19 +99,14 @@ const TableStickyHeader = () => {
         throw error
       }
 
-      // Reset the id counter
       idCounter = 0
 
-      // Update the id field with sequential count and add image URL
       const formattedData = data.map(item => ({
         ...item,
         sn: ++idCounter,
-        image: item.uploadedImageUrl // Assuming uploadedImageUrls is an array of image URLs
+        image: item.uploadedImageUrl
       }))
 
-      const urls = data[0]?.uploadedImageUrls
-
-      setImageUrl(urls)
       setTableData(formattedData)
     } catch (error) {
       console.error('Error fetching data:', error.message)
@@ -129,44 +125,42 @@ const TableStickyHeader = () => {
         setFailed(error.message)
       } else {
         setFailed('')
-        setSuccess('Product deleted successfully!')
+        setSuccess('Order deleted successfully!')
       }
     } catch (error) {
-      setFailed(error.message)
+      setFailed('Network error')
     } finally {
       setDeleteLoadingId(null)
       fetchData()
 
-      // Reset success and failure after a delay
       setTimeout(() => {
         setSuccess('')
       }, 3000)
     }
   }
 
-  const handleEdit = (id, price, stock) => {
-    setEditProductId(id)
-    setEditPrice(price)
-    setEditStock(stock)
+  const handleEdit = (id, status) => {
+    setEditOrderId(id)
   }
 
   const handleSaveEdit = async () => {
     setIsLoading(true)
     try {
       const { error } = await supabase
-        .from(`${storeName}`)
-        .update({ price: editPrice, stock: editStock })
+        .from('royeshoesOrders')
+        .update({ status: editOrderStatus })
         .eq('user_id', userId)
-        .eq('id', editProductId)
+        .eq('id', editOrderId)
 
       if (error) {
         setFailed(error.message)
       } else {
-        setSuccess('Product updated successfully!')
+        setSuccess('Order updated successfully!')
       }
 
       await fetchData()
-      setEditProductId(null)
+      setEditOrderId(null)
+      setAnchorEl(null)
     } catch (error) {
       console.error('Error updating data:', error.message)
     } finally {
@@ -251,23 +245,31 @@ const TableStickyHeader = () => {
                       </TableCell>
                     ))}
                     <TableCell>
-                      <LoadingButton
-                        sx={{ m: 1, width: '100%' }}
-                        size='small'
-                        variant='outlined'
-                        onClick={() => handleEdit(row.id, row.price, row.stock)}
+                      <MoreVertIcon
+                        onClick={handlePopoverOpen}
+                        aria-controls={Boolean(anchorEl) ? 'edit-delete-popover' : undefined}
+                        aria-haspopup='true'
+                        sx={{ cursor: 'pointer' }}
+                      />
+                      <Popover
+                        id='edit-delete-popover'
+                        open={Boolean(anchorEl)}
+                        anchorEl={anchorEl}
+                        onClose={handlePopoverClose}
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'center'
+                        }}
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'center'
+                        }}
                       >
-                        Edit
-                      </LoadingButton>
-                      <LoadingButton
-                        sx={{ m: 1, width: '100%' }}
-                        size='small'
-                        variant='outlined'
-                        onClick={() => handleDelete(row.id)}
-                        loading={Boolean(deleteLoadingId === row.id)}
-                      >
-                        Delete
-                      </LoadingButton>
+                        <MenuItem onClick={() => handleEdit(row.id, row.price, row.stock)}>Edit</MenuItem>
+                        <MenuItem onClick={() => handleDelete(row.id)} disabled={Boolean(deleteLoadingId === row.id)}>
+                          Delete
+                        </MenuItem>
+                      </Popover>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -286,28 +288,27 @@ const TableStickyHeader = () => {
       </TableContainer>
 
       {/* Edit Dialog */}
-      <Dialog open={Boolean(editProductId)} onClose={() => setEditProductId(null)}>
+      <Dialog open={Boolean(editOrderId)} onClose={() => setEditOrderId(null)}>
         <DialogTitle className='flex justify-between items-center'>
-          Update Product <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setEditProductId(null)} />
+          Update Order <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setEditOrderId(null)} />
         </DialogTitle>
         <DialogContent className='grid gap-5'>
           <Grid item xs={12} sm={3}></Grid>
           <Grid item xs={12} sm={3}>
-            <TextField label='Price(₦)' type='number' value={editPrice} onChange={e => setEditPrice(e.target.value)} />
-          </Grid>
-          <Grid item xs={12} sm={3}>
             <FormControl fullWidth>
-              <InputLabel id='form-layouts-separator-select-label'>Product Inventory</InputLabel>
+              <InputLabel id='form-layouts-separator-select-label'>Order Status</InputLabel>
               <Select
-                label='Product Inventory'
+                label='Order Status'
                 type='text'
                 id='form-layouts-separator-select'
                 labelId='form-layouts-separator-select-label'
-                value={editStock}
-                onChange={e => setEditStock(e.target.value)}
+                value={editOrderStatus}
+                onChange={e => setEditOrderStatus(e.target.value)}
               >
-                <MenuItem value='In Stock'>In Stock</MenuItem>
-                <MenuItem value='Out of Stock'>Out of Stock</MenuItem>
+                <MenuItem value='In Progress'>In Progress</MenuItem>
+                <MenuItem value='Shipped'>Shipped</MenuItem>
+                <MenuItem value='Delivered'>Delivered</MenuItem>
+                <MenuItem value='Refunded'>Refunded</MenuItem>
               </Select>
             </FormControl>
           </Grid>

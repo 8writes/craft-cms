@@ -1,211 +1,231 @@
 // ** React Imports
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 
 // ** MUI Imports
-import Paper from '@mui/material/Paper'
-import Grid from '@mui/material/Grid'
-import Table from '@mui/material/Table'
-import TableRow from '@mui/material/TableRow'
-import TableHead from '@mui/material/TableHead'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TablePagination from '@mui/material/TablePagination'
-import { Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Skeleton, Typography } from '@mui/material'
-import LoadingButton from '@mui/lab/LoadingButton'
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import TextField from '@mui/material/TextField'
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import Table from '@mui/material/Table';
+import TableRow from '@mui/material/TableRow';
+import TableHead from '@mui/material/TableHead';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TablePagination from '@mui/material/TablePagination';
+import { Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Skeleton, Typography } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import MoreVertIcon from '@mui/icons-material/MoreVert';  // <-- Import MoreVertIcon
+import Popover from '@mui/material/Popover';
 
-import { useUser } from 'src/@core/context/userDataContext'
-import IntroHeading from './Header'
+import { useUser } from 'src/@core/context/userDataContext';
+import IntroHeading from './Header';
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-let idCounter = 0
+let idCounter = 0;
 
+// Define table columns
 const columns = [
   { id: 'sn', label: 'S/N' },
   { id: 'image', label: 'Preview' },
   { id: 'name', label: 'Product Name' },
   { id: 'size', label: 'Size' },
-  {
-    id: 'date',
-    label: 'Date'
-  },
-  {
-    id: 'price',
-    label: 'Price (₦)',
-    format: value => value.toLocaleString('en-US')
-  },
+  { id: 'date', label: 'Date' },
+  { id: 'price', label: 'Price (₦)', format: value => value.toLocaleString('en-US') },
   { id: 'stock', label: 'Inventory' },
-  { id: 'action', label: '' }
-]
+  { id: 'action', label: '' },
+];
 
 const TableStickyHeader = () => {
-  const userData = useUser()
-  const [success, setSuccess] = useState('')
-  const [failed, setFailed] = useState('')
-  const [suspense, setSuspense] = useState('')
-  const [isLoading, setIsLoading] = useState('')
-   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  const userData = useUser();
+  const [success, setSuccess] = useState('');
+  const [failed, setFailed] = useState('');
+  const [suspense, setSuspense] = useState('');
+  const [isLoading, setIsLoading] = useState('');
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
 
   // ** States
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [tableData, setTableData] = useState([])
-  const [userId, setUserId] = useState('')
-  const [editProductId, setEditProductId] = useState(null)
-  const [editPrice, setEditPrice] = useState(0)
-  const [editStock, setEditStock] = useState(0)
-  const [imageUrls, setImageUrl] = useState([])
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [tableData, setTableData] = useState([]);
+  const [userId, setUserId] = useState('');
+  const [editProductId, setEditProductId] = useState(null);
+  const [editPrice, setEditPrice] = useState(0);
+  const [editStock, setEditStock] = useState(0);
+  const [imageUrls, setImageUrl] = useState([]);
+  
+  // States for popover
+   const [anchorEl, setAnchorEl] = useState(null);
 
+  // Function to handle the opening of the popover
+  const handlePopoverOpen = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  // Function to handle the closing of the popover
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  // Fetch user data on component mount
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data } = await supabase.auth.getUser()
-        const userId = data?.user?.id || ''
-        setUserId(userId)
+        const { data } = await supabase.auth.getUser();
+        const userId = data?.user?.id || '';
+        setUserId(userId);
       } catch (e) {
-        console.error('Error getting user:', e)
+        console.error('Error getting user:', e);
       }
-    }
-    getUser()
-    const storeName = userData?.user_metadata?.store_name
+    };
+
+    getUser();
+    const storeName = userData?.user_metadata?.store_name;
 
     if (storeName) {
-      fetchData()
+      fetchData();
     }
-  }, [userData?.user_metadata?.store_name])
+  }, [userData?.user_metadata?.store_name]);
 
-  const storeName = userData?.user_metadata?.store_name
+  // Store user metadata and product data
+  const storeName = userData?.user_metadata?.store_name;
 
+  // Fetch product data from Supabase
   const fetchData = async () => {
-    setSuspense(true)
+    setSuspense(true);
+
     try {
-      const { data, error } = await supabase.from(`${storeName}`).select()
+      const { data, error } = await supabase.from(`${storeName}`).select();
 
       if (error) {
-        throw error
+        throw error;
       }
 
       // Reset the id counter
-      idCounter = 0
+      idCounter = 0;
 
       // Update the id field with sequential count and add image URL
       const formattedData = data.map(item => ({
         ...item,
         sn: ++idCounter,
-        image: item.uploadedImageUrls // Assuming uploadedImageUrls is an array of image URLs
-      }))
+        image: item.uploadedImageUrls, // Assuming uploadedImageUrls is an array of image URLs
+      }));
 
-      const urls = data[0]?.uploadedImageUrls
+      const urls = data[0]?.uploadedImageUrls;
 
-      setImageUrl(urls)
-      setTableData(formattedData)
+      setImageUrl(urls);
+      setTableData(formattedData);
     } catch (error) {
-      console.error('Error fetching data:', error.message)
+      console.error('Error fetching data:', error.message);
     } finally {
-      setSuspense(false)
+      setSuspense(false);
     }
-  }
+  };
 
+  // Delete product image from Supabase Storage
   const deleteImage = async () => {
     try {
       // Modify the URLs to remove the dynamic part before the first "/"
       const modifiedUrls = imageUrls.map(url => {
-        const firstSlashIndex = url.indexOf('/')
+        const firstSlashIndex = url.indexOf('/');
+        return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url;
+      });
 
-        return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url
-      })
-
-      const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls)
+      const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls);
 
       if (error) {
-        console.log('send error to support:', error.message)
+        console.log('send error to support:', error.message);
       }
     } catch (error) {
-      console.error('Error deleting images:', error.message)
+      console.error('Error deleting images:', error.message);
     }
-  }
+  };
 
+  // Handle product deletion
   const handleDelete = async id => {
-    await deleteImage()
-    setDeleteLoadingId(id)
+    await deleteImage();
+    setDeleteLoadingId(id);
 
     try {
-      const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id)
+      const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id);
 
       if (error) {
-        setFailed(error.message)
+        setFailed(error.message);
       } else {
-        setFailed('')
-        setSuccess('Product deleted successfully!')
+        setFailed('');
+        setSuccess('Product deleted successfully!');
       }
-
     } catch (error) {
-      setFailed(error.message)
+      setFailed('Network error');
     } finally {
-       setDeleteLoadingId(null)
-      fetchData()
-     
+      setDeleteLoadingId(null);
+      fetchData();
+
       // Reset success and failure after a delay
       setTimeout(() => {
-        setSuccess('')
-      }, 3000)
+        setSuccess('');
+      }, 3000);
     }
-  }
+  };
 
+  // Handle product edit
   const handleEdit = (id, price, stock) => {
-    setEditProductId(id)
-    setEditPrice(price)
-    setEditStock(stock)
-  }
+    setEditProductId(id);
+    setEditPrice(price);
+    setEditStock(stock);
+  };
 
+  // Handle saving edited product
   const handleSaveEdit = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const { error } = await supabase
         .from(`${storeName}`)
         .update({ price: editPrice, stock: editStock })
         .eq('user_id', userId)
-        .eq('id', editProductId)
+        .eq('id', editProductId);
 
       if (error) {
-        setFailed(error.message)
+        setFailed(error.message);
       } else {
-        setSuccess('Product updated successfully!')
+        setSuccess('Product updated successfully!');
       }
 
-      await fetchData()
-      setEditProductId(null)
+      await fetchData();
+      setEditProductId(null);
+      setAnchorEl(null);
     } catch (error) {
-      console.error('Error updating data:', error.message)
+      console.error('Error updating data:', error.message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
 
+      // Reset success and failure after a delay
       setTimeout(() => {
-        setSuccess('')
-      }, 3000)
+        setSuccess('');
+      }, 3000);
     }
-  }
+  };
 
+  // Handle page change in pagination
   const handleChangePage = (event, newPage) => {
-    setPage(newPage)
-  }
+    setPage(newPage);
+  };
 
+  // Handle rows per page change in pagination
   const handleChangeRowsPerPage = event => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -279,24 +299,31 @@ const TableStickyHeader = () => {
                       </TableCell>
                     ))}
                     <TableCell>
-                      <LoadingButton
-                        sx={{ m: 1, width: '100%' }}
-                        size='small'
-                        variant='outlined'
-                        onClick={() => handleEdit(row.id, row.price, row.stock)}
-                       
+                      <MoreVertIcon
+                        onClick={handlePopoverOpen}
+                        aria-controls={Boolean(anchorEl) ? 'edit-delete-popover' : undefined}
+                        aria-haspopup='true'
+                        sx={{cursor: 'pointer'}}
+                      />
+                      <Popover
+                        id='edit-delete-popover'
+                        open={Boolean(anchorEl)}
+                        anchorEl={anchorEl}
+                        onClose={handlePopoverClose}
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'center',
+                        }}
                       >
-                        Edit
-                      </LoadingButton>
-                      <LoadingButton
-                        sx={{ m: 1, width: '100%' }}
-                        size='small'
-                        variant='outlined'
-                        onClick={() => handleDelete(row.id)}
-                       loading={Boolean(deleteLoadingId === row.id)}
-                      >
-                        Delete
-                      </LoadingButton>
+                        <MenuItem onClick={() => handleEdit(row.id, row.price, row.stock)}>Edit</MenuItem>
+                        <MenuItem onClick={() => handleDelete(row.id)} disabled={Boolean(deleteLoadingId === row.id)}>
+                          Delete
+                        </MenuItem>
+                      </Popover>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -317,12 +344,18 @@ const TableStickyHeader = () => {
       {/* Edit Dialog */}
       <Dialog open={Boolean(editProductId)} onClose={() => setEditProductId(null)}>
         <DialogTitle className='flex justify-between items-center'>
-          Update Product <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setEditProductId(null)} />
+          Update Product{' '}
+          <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setEditProductId(null)} />
         </DialogTitle>
         <DialogContent className='grid gap-5'>
           <Grid item xs={12} sm={3}></Grid>
           <Grid item xs={12} sm={3}>
-            <TextField label='Price(₦)' type='number' value={editPrice} onChange={e => setEditPrice(e.target.value)} />
+            <TextField
+              label='Price(₦)'
+              type='number'
+              value={editPrice}
+              onChange={e => setEditPrice(e.target.value)}
+            />
           </Grid>
           <Grid item xs={12} sm={3}>
             <FormControl fullWidth>
@@ -348,6 +381,7 @@ const TableStickyHeader = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Pagination */}
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
@@ -358,7 +392,7 @@ const TableStickyHeader = () => {
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </Paper>
-  )
-}
+  );
+};
 
-export default TableStickyHeader
+export default TableStickyHeader;
