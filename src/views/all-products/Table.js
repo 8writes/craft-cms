@@ -138,6 +138,7 @@ const TableStickyHeader = () => {
       // Modify the URLs to remove the dynamic part before the first "/"
       const modifiedUrls = imageUrls.map(url => {
         const firstSlashIndex = url.indexOf('/');
+        
         return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url;
       });
 

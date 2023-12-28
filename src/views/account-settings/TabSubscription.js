@@ -10,7 +10,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Divider
+  Divider,
+  FormControl
 } from '@mui/material'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 
@@ -88,24 +89,29 @@ const TabSubscription = () => {
 
         {/* Dialog for displaying subscription details */}
         <Dialog open={isPopupOpen} onClose={() => setIsPopupOpen(false)}>
-          <DialogTitle>
-            Subscription Details{' '}
-            <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setIsPopupOpen(false)} />
-          </DialogTitle>
+                  <FormControl fullWidth>
+                      <DialogTitle>
+            
+              Subscription Details{' '}
+              <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setIsPopupOpen(false)} />
+           
+          </DialogTitle> </FormControl>
           <DialogContent>
-            <Typography variant='body1' gutterBottom>
-              Plan: Basic
-            </Typography>
-            <Typography variant='body1' gutterBottom>
-              Amount: ₦5000 (NGN)
-            </Typography>
-            <Typography variant='body1' gutterBottom>
-              Valid for: 1 month
-            </Typography>
-            <Divider />
-            <Typography variant='body1' gutterBottom>
-              Max Product: 50
-            </Typography>
+            <FormControl fullWidth>
+              <Typography variant='body1' gutterBottom>
+                Plan: Basic
+              </Typography>
+              <Typography variant='body1' gutterBottom>
+                Amount: ₦5000 (NGN)
+              </Typography>
+              <Typography variant='body1' gutterBottom>
+                Valid for: 1 month
+              </Typography>
+              <Divider />
+              <Typography variant='body1' gutterBottom>
+                Max Product: 50
+              </Typography>
+            </FormControl>
           </DialogContent>
           <DialogActions>
             {/* Button to confirm and proceed with payment */}
