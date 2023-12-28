@@ -117,10 +117,11 @@ const RegisterPage = () => {
             last_name: lastName,
             store_name: storeName,
             subscription: 'Free',
-            sub_amount: '0',
-            validity: 'Lifetime',
-            max_product: '5',
+            plan_amount: '0',
+            plan_validity: 'Lifetime',
+            product_count: '0',
             storage: false,
+            trial: false,
             store_orderId: `${storeName}Orders`,
           }
         }

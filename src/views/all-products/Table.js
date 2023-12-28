@@ -63,18 +63,21 @@ const TableStickyHeader = () => {
   const [editPrice, setEditPrice] = useState(0);
   const [editStock, setEditStock] = useState(0);
   const [imageUrls, setImageUrl] = useState([]);
-  
-  // States for popover
-   const [anchorEl, setAnchorEl] = useState(null);
+
+ // States for popover
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [deleteProductId, setDeleteProductId] = useState(null);
 
   // Function to handle the opening of the popover
-  const handlePopoverOpen = event => {
+  const handlePopoverOpen = (event, id) => {
     setAnchorEl(event.currentTarget);
+    setDeleteProductId(id);
   };
 
   // Function to handle the closing of the popover
   const handlePopoverClose = () => {
     setAnchorEl(null);
+    setDeleteProductId(null);
   };
 
   // Fetch user data on component mount
@@ -230,7 +233,7 @@ const TableStickyHeader = () => {
     setPage(0);
   };
 
-  return (
+   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
@@ -287,14 +290,14 @@ const TableStickyHeader = () => {
                             alt={`Product ${row.sn} Image`}
                             style={{ width: '60px', height: '50px', borderRadius: '5px' }}
                           />
-                          ) : column.id === 'size' ? (
-                            row[column.id].map((size, index) => (
-                              <span key={index}>
-                                {size}
-                                {index < row[column.id].length - 1 && ', '}
-                              </span>
-                            ))
-                          ) : column.format && typeof row[column.id] === 'number' ? (
+                        ) : column.id === 'size' ? (
+                          row[column.id].map((size, index) => (
+                            <span key={index}>
+                              {size}
+                              {index < row[column.id].length - 1 && ', '}
+                            </span>
+                          ))
+                        ) : column.format && typeof row[column.id] === 'number' ? (
                           column.format(row[column.id])
                         ) : (
                           row[column.id]
@@ -303,14 +306,14 @@ const TableStickyHeader = () => {
                     ))}
                     <TableCell>
                       <MoreVertIcon
-                        onClick={handlePopoverOpen}
+                        onClick={e => handlePopoverOpen(e, row.id)}
                         aria-controls={Boolean(anchorEl) ? 'edit-delete-popover' : undefined}
                         aria-haspopup='true'
-                        sx={{cursor: 'pointer'}}
+                        sx={{ cursor: 'pointer' }}
                       />
                       <Popover
                         id='edit-delete-popover'
-                        open={Boolean(anchorEl)}
+                        open={Boolean(anchorEl && deleteProductId === row.id)}
                         anchorEl={anchorEl}
                         onClose={handlePopoverClose}
                         anchorOrigin={{
@@ -323,7 +326,10 @@ const TableStickyHeader = () => {
                         }}
                       >
                         <MenuItem onClick={() => handleEdit(row.id, row.price, row.stock)}>Edit</MenuItem>
-                        <MenuItem onClick={() => handleDelete(row.id)} disabled={Boolean(deleteLoadingId === row.id)}>
+                        <MenuItem
+                          onClick={() => handleDelete(row.id)}
+                          disabled={Boolean(deleteLoadingId === row.id)}
+                        >
                           Delete
                         </MenuItem>
                       </Popover>
@@ -354,11 +360,11 @@ const TableStickyHeader = () => {
           <Grid item xs={12} sm={3}></Grid>
           <Grid item xs={12} sm={3}>
             <FormControl fullWidth>
-            <TextField
-              label='Price(₦)'
-              type='number'
-              value={editPrice}
-              onChange={e => setEditPrice(e.target.value)}
+              <TextField
+                label='Price(₦)'
+                type='number'
+                value={editPrice}
+                onChange={e => setEditPrice(e.target.value)}
               />
             </FormControl>
           </Grid>

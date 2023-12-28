@@ -126,7 +126,7 @@ const Intro = () => {
           </div>
         ) : (
           <>
-            <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
+            <Typography variant='h6' sx={{ my: 4, color: 'primary.main' }}>
               Kindly activate your account
             </Typography>
             

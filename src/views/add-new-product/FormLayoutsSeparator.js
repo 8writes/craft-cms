@@ -60,8 +60,6 @@ const FormLayoutsSeparator = () => {
 
   const MAX_IMAGES = 4 // Maximum number of images allowed
 
-  const isMounted = useRef(true)
-
   const isDisabled =
     !productName || !productDescription || !productStock || !sellingPrice || !productTag || selectedImages.length === 0 
 
@@ -192,35 +190,38 @@ const handleUpload = async () => {
       throw new Error(error.message);
     }
 
-    const maxProduct = data?.user?.user_metadata?.max_product || 5;
+   // Fetch product count and subscription limit
+const productCount = data?.user?.user_metadata?.product_count || 0;
+let subscriptionLimit;
 
-    // Fetch subscription limit based on subscription type
-    let subscriptionLimit;
-    switch (subscription) {
-      case 'free':
-        subscriptionLimit = 5;
-        break;
-      case 'basic':
-        subscriptionLimit = 50;
-        break;
-      case 'premium':
-        subscriptionLimit = 100;
-        break;
-      default:
-        subscriptionLimit = 5; // Default to free subscription
-        break;
-    }
+switch (subscription) {
+  case 'Free':
+    subscriptionLimit = 0;
+    break;
+  case 'Trial':
+    subscriptionLimit = 5;
+    break;
+  case 'Basic':
+    subscriptionLimit = 50;
+    break;
+  case 'Premium':
+    subscriptionLimit = 100;
+    break;
+  default:
+    subscriptionLimit = 0; // Default to free subscription
+    break;
+}
 
-    // Check if the user has reached the subscription limit
-    if (maxProduct >= subscriptionLimit) {
-      setFailed(`You have reached the maximum of ${maxProduct} limit for your subscription .`);
+// Check if the user has reached the subscription limit
+if (productCount >= subscriptionLimit) {
+  setFailed(`You have reached the maximum limit of ${subscriptionLimit} for your subscription.`);
 
-      return;
-    }
-
-    // Proceed with the product upload
+  return;
+} else {
+   // Proceed with the product upload
 
     await handleUploadForm();
+}  
   } catch (error) {
     console.error('An unexpected error occurred:', error.message);
   } finally {

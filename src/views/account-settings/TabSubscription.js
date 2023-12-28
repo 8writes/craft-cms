@@ -28,10 +28,10 @@ const TabSubscription = () => {
   const userData = useUser()
   const [isPopupOpen, setIsPopupOpen] = useState(false)
 
-  const subscriptionValidity = userData?.user_metadata?.validity
+  const subscriptionValidity = userData?.user_metadata?.plan_validity
   const storeSubscription = userData?.user_metadata?.subscription
-  const subscriptionAmount = userData?.user_metadata?.sub_amount
-  const maxProducts = userData?.user_metadata?.max_product
+  const subscriptionAmount = userData?.user_metadata?.plan_amount
+  const  productCount = userData?.user_metadata?.product_count
 
   // Paystack configuration
   const paystackPublicKey = 'pk_test_990b84e62bcd13690d07272f933a2080b195ce10' // Replace with your Paystack public key
@@ -87,7 +87,7 @@ const TabSubscription = () => {
         </Typography>
         <Divider />
         <Typography variant='body1' gutterBottom>
-          Max Products: {maxProducts}
+          Max Products: { productCount}
         </Typography>
 
         <Box className='mt-5'>
