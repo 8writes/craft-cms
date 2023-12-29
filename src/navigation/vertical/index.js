@@ -9,6 +9,7 @@ import AddIcon from '@mui/icons-material/Add'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded';
 import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import StoreRoundedIcon from '@mui/icons-material/StoreRounded';
  
 const navigation = () => {
   return [
@@ -52,6 +53,11 @@ const navigation = () => {
       title: 'Settings',
       icon: CogOutline,
       path: '/account-settings'
+    },
+     {
+      icon: StoreRoundedIcon,
+      title: 'Store Template',
+      path: '#'
     },
     {
       sectionTitle: 'Customer Care'
