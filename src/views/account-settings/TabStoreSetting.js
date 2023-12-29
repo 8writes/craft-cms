@@ -53,7 +53,7 @@ const StoreSetting = () => {
       
       setTimeout(() => {
         setSuccess('')
-      }, 9000)
+      }, 8000)
     }
  }
   

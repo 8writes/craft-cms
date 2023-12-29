@@ -115,7 +115,7 @@ const Trial = () => {
 
         setTimeout(() => {
         setSuccess('')
-      }, 5000)
+      }, 8000)
     }
   }
 

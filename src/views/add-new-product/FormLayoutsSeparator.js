@@ -23,7 +23,7 @@ import Link from 'next/link'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
- 
+
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -56,15 +56,16 @@ const FormLayoutsSeparator = () => {
   const [userId, setUserId] = useState('')
   const [formDisabled, setFormDisabled] = useState(false)
   const [productSizes, setProductSizes] = useState([])
+  const [productCount, setProductCount] = useState(0)
   const [selectedImages, setSelectedImages] = useState([])
 
   const MAX_IMAGES = 4 // Maximum number of images allowed
 
   const isDisabled =
-    !productName || !productDescription || !productStock || !sellingPrice || !productTag || selectedImages.length === 0 
+    !productName || !productDescription || !productStock || !sellingPrice || !productTag || selectedImages.length === 0
 
   // Function to handle size change
-  const handleSizeChange = (index, value) => { 
+  const handleSizeChange = (index, value) => {
     const newSizes = [...productSizes]
     newSizes[index] = value
     setProductSizes(newSizes)
@@ -93,7 +94,7 @@ const FormLayoutsSeparator = () => {
       try {
         const { data } = await supabase.auth.getUser()
         const userId = data?.user?.id || ''
-        
+
         setUserId(userId)
       } catch (e) {
         console.error('Error getting user:', e)
@@ -168,6 +169,7 @@ const FormLayoutsSeparator = () => {
       if (error) {
         setFailed(error.message)
       } else {
+        console.log(data)
         setFailed('')
         setSuccess('Product Uploaded successfully!')
       }
@@ -177,65 +179,84 @@ const FormLayoutsSeparator = () => {
     }
   }
 
- // Function to handle the overall upload process
-const handleUpload = async () => {
-  setLoading(true);
-  setFormDisabled(true);
+ // Function to fetch product count
+  const handleDataCount = async () => {
+    try {
+      const { data, error } = await supabase.from(`${storeName}`).select();
 
-  try {
-    // Fetch user information including max_product
-    const { data, error } = await supabase.auth.getUser();
+      if (error) {
 
-    if (error) {
-      throw new Error(error.message);
+      } else {
+        // Check for product data and calculate product count
+        const dataCount = data ? data.length : 0;
+
+        setProductCount(dataCount);
+      }
+    } catch (error) {
     }
+  };
 
-   // Fetch product count and subscription limit
-const productCount = data?.user?.user_metadata?.product_count || 0;
-let subscriptionLimit;
+  // Fetch product count on component mount
+  useEffect(() => {
+    handleDataCount();
+  }, [storeName]); // Trigger the effect when storeName changes
 
-switch (subscription) {
-  case 'Free':
-    subscriptionLimit = 0;
-    break;
-  case 'Trial':
-    subscriptionLimit = 5;
-    break;
-  case 'Basic':
-    subscriptionLimit = 50;
-    break;
-  case 'Premium':
-    subscriptionLimit = 100;
-    break;
-  default:
-    subscriptionLimit = 0; // Default to free subscription
-    break;
-}
 
-// Check if the user has reached the subscription limit
-if (productCount >= subscriptionLimit) {
-  setFailed(`You have reached the maximum limit of ${subscriptionLimit} for your subscription.`);
+  // Function to handle the overall upload process
+  const handleUpload = async () => {
+    setLoading(true)
+    setFormDisabled(true)
 
-  return;
-} else {
-   // Proceed with the product upload
+    try {
+      // Fetch user information including max_product
+      const { data, error } = await supabase.auth.getUser()
 
-    await handleUploadForm();
-}  
-  } catch (error) {
-    console.error('An unexpected error occurred:', error.message);
-  } finally {
-    // Reset success and failure after a delay
-    setTimeout(() => {
-      setSuccess('');
-    }, 9000);
+      if (error) {
+        throw new Error(error.message)
+      }
 
-    clearForm();
+      let subscriptionLimit
+      switch (subscription) {
+        case 'Free':
+          subscriptionLimit = 0
+          break
+        case 'Trial':
+          subscriptionLimit = 5
+          break
+        case 'Basic':
+          subscriptionLimit = 50
+          break
+        case 'Premium':
+          subscriptionLimit = 100
+          break
+        default:
+          subscriptionLimit = 0 // Default to free subscription
+          break
+      }
 
-    setFormDisabled(false);
-    setLoading(false);
+      // Check if the user has reached the subscription limit
+      if (productCount >= subscriptionLimit) {
+        setFailed(`You have reached the maximum of ${subscriptionLimit} products for your subscription.`)
+
+        return
+      } else {
+        await handleUploadForm()
+        handleDataCount();
+      }
+    } catch (error) {
+      console.error('An unexpected error occurred:', error.message)
+    } finally {
+      // Reset success and failure after a delay
+      setTimeout(() => {
+        setSuccess('')
+      }, 8000)
+
+      clearForm()
+
+      setFormDisabled(false)
+      setLoading(false)
+    }
   }
-};
 
   // Function to clear form fields
   const clearForm = () => {
@@ -406,7 +427,7 @@ if (productCount >= subscriptionLimit) {
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel id='form-layouts-separator-select-label'>Product Tag</InputLabel>
+                <InputLabel id='form-layouts-separator-select-label'>Product Category</InputLabel>
                 <Select
                   label='Product Tag'
                   defaultValue=''
@@ -418,14 +439,15 @@ if (productCount >= subscriptionLimit) {
                   onChange={e => setProductTag(e.target.value)}
                 >
                   <MenuItem value=''>None</MenuItem>
-                  <MenuItem value='shoe'>Shoe</MenuItem>
-                  <MenuItem value='bag'>Bag</MenuItem>
-                  <MenuItem value='phone'>Phone</MenuItem>
-                  <MenuItem value='tablet'>Tablet</MenuItem>
-                  <MenuItem value='laptop'>Laptop</MenuItem>
-                  <MenuItem value='kids'>Kids Wear</MenuItem>
-                  <MenuItem value='adultMen'>Adults Wear (Men)</MenuItem>
-                  <MenuItem value='adultWomen'>Adults Wear (Women)</MenuItem>
+                  <MenuItem value='clothing&fashion'>Clothing and Fashion</MenuItem>
+                  <MenuItem value='footwear'>Footwear</MenuItem>
+                  <MenuItem value='accessories'>Accessories</MenuItem>
+                  <MenuItem value='electronics'>Electronics</MenuItem>
+                  <MenuItem value='pet&supply'>Pet Supply</MenuItem>
+                  <MenuItem value='home&living'>Home and Living</MenuItem>
+                  <MenuItem value='beauty&care'>Beauty and Personal Care</MenuItem>
+                  <MenuItem value='sports&outdoors'>Sports and Outdoors</MenuItem>
+                  <MenuItem value='books&music&media'>Books, Music and Media </MenuItem>
                 </Select>
               </FormControl>
             </Grid>

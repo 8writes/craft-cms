@@ -10,7 +10,7 @@ import AlertTitle from '@mui/material/AlertTitle'
 import IconButton from '@mui/material/IconButton'
 import CardContent from '@mui/material/CardContent'
 import Skeleton from '@mui/material/Skeleton'
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 
 // ** Icons Imports
 import Close from 'mdi-material-ui/Close'
@@ -30,38 +30,41 @@ const TabProfile = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [success, setSuccess] = useState('')
   const [failed, setFailed] = useState('')
-  const isLoading = !userData
+  const skeleton = !userData
+  const [isLoading, setLoading] = useState(false)
 
   const userFirstName = userData?.user_metadata?.first_name
   const userLastName = userData?.user_metadata?.last_name
   const subscription = userData?.user_metadata?.subscription
   const createdAt = userData?.created_at
- const oldEmail = userData?.email;
-const changeEmail = userData?.email_change;
+  const oldEmail = userData?.email
+  const changeEmail = userData?.email_change
 
   const handleEmailChange = event => {
     setNewEmail(event.target.value)
   }
 
- const handleUpdateEmail = async () => {
-  try {
-    const { data, error } = await supabase.auth.updateUser({ email: `${newEmail}` })
-    if (error) {
-      setFailed(error.message)
-    } else {
-      setSuccess('Email updated successfully!')
-      setNewEmail(changeEmail); // Update local state with the new email
+  const handleUpdateEmail = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase.auth.updateUser({ email: `${newEmail}` })
+      if (error) {
+        setFailed(error.message)
+      } else {
+        setSuccess(`An email has been sent to ${newEmail}`)
+        setNewEmail(changeEmail) // Update local state with the new email
+      }
+    } catch (error) {
+      // Handle error if needed
+    } finally {
+      setIsEditing(false)
+      setLoading(false)
     }
-  } catch (error) {
-    // Handle error if needed
-  } finally {
-    setIsEditing(false)
+    setTimeout(() => {
+      setSuccess('')
+    }, 8000)
   }
-  setTimeout(() => {
-    setSuccess('')
-  }, 2000)
- }
-  
+
   return (
     <CardContent>
       {success && (
@@ -78,7 +81,7 @@ const changeEmail = userData?.email_change;
           </Alert>
         </Grid>
       )}
-      {isLoading ? (
+      {skeleton ? (
         <Grid container spacing={7} sx={{ marginTop: 1, marginBottom: 10 }}>
           {[...Array(6)].map((_, index) => (
             <Grid item xs={12} sm={6} key={index}>
@@ -106,6 +109,7 @@ const changeEmail = userData?.email_change;
                   <LoadingButton
                     variant='outlined'
                     size='small'
+                    loading={Boolean(isLoading)}
                     sx={{ margin: '5px' }}
                     type='button'
                     onClick={handleUpdateEmail}

@@ -83,7 +83,7 @@ const TabSubscription = () => {
           Amount: ₦{subscriptionAmount} (NGN)
         </Typography>
         <Typography variant='body1' gutterBottom>
-          Valid for: {subscriptionValidity}
+           Expires: {subscriptionValidity}
         </Typography>
         <Divider />
         <Typography variant='body1' gutterBottom>

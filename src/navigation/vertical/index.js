@@ -54,7 +54,7 @@ const navigation = () => {
       path: '/account-settings'
     },
     {
-      sectionTitle: 'Support'
+      sectionTitle: 'Customer Care'
     },
     {
       title: 'Support',
