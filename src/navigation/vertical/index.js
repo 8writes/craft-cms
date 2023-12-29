@@ -62,7 +62,7 @@ const navigation = () => {
       path: '#'
     },
     {
-      title: 'FAQ',
+      title: 'How To?',
       icon: QuizRoundedIcon,
       path: '#'
     },
