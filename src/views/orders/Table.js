@@ -8,7 +8,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
-import { Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Skeleton, Typography } from '@mui/material'
+import { Alert, FormControl, InputLabel, MenuItem, Select, Skeleton, TextField, Typography } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import Dialog from '@mui/material/Dialog'
@@ -17,9 +17,12 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Popover from '@mui/material/Popover'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import { styled, useTheme } from '@mui/material/styles'
+import SearchIcon from '@mui/icons-material/Search'
 
 import { useUser } from 'src/@core/context/userDataContext'
-import IntroHeading from './Header'
 
 import { createClient } from '@supabase/supabase-js'
 
@@ -48,6 +51,19 @@ const TableStickyHeader = () => {
   const [suspense, setSuspense] = useState('')
   const [isLoading, setIsLoading] = useState('')
   const [deleteLoadingId, setDeleteLoadingId] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  // ** Hook
+  const theme = useTheme()
+  const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
+
+  // Styled component for the triangle shaped background image
+  const TriangleImg = styled('img')({
+    right: 0,
+    bottom: 0,
+    height: 170,
+    position: 'absolute'
+  })
 
   // States for edit functionality
   const [page, setPage] = useState(0)
@@ -107,73 +123,80 @@ const TableStickyHeader = () => {
         image: item.uploadedImageUrl
       }))
 
-      setTableData(formattedData)
+      const filteredData = formattedData.filter(
+        item =>
+          item.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.reference.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+
+      setTableData(filteredData)
     } catch (error) {
       console.error(error)
-      setFailed(error)
+      setFailed(error.message)
     } finally {
       setSuspense(false)
     }
   }
 
-const handleDelete = async id => {
-  setDeleteLoadingId(id);
-
-  try {
-    const { error } = await supabase.from(`${storeOrderId}`).delete().eq('id', id);
-
-    if (error) {
-      throw error;
-    }
-
-    setSuccess('Order deleted successfully!');
-  } catch (error) {
-    console.error(error);
-    setFailed(error.message || 'Error deleting order.');
-  } finally {
-    setDeleteLoadingId(null);
-    setAnchorEl(null);
-    fetchData(); // Refetch data after deletion
-
-    setTimeout(() => {
-      setSuccess('');
-    }, 3000);
+  const handleSearch = () => {
+    fetchData() // Trigger fetch data with the search term
   }
-};
 
-  const handleEdit = (id) => {
+  const handleDelete = async id => {
+    setDeleteLoadingId(id)
+
+    try {
+      const { error } = await supabase.from(`${storeOrderId}`).delete().eq('id', id)
+
+      if (error) {
+        throw error
+      }
+
+      setSuccess('Order deleted successfully!')
+    } catch (error) {
+      console.error(error)
+      setFailed(error.message || 'Error deleting order.')
+    } finally {
+      setDeleteLoadingId(null)
+      setAnchorEl(null)
+      fetchData() // Refetch data after deletion
+
+      setTimeout(() => {
+        setSuccess('')
+      }, 3000)
+    }
+  }
+
+  const handleEdit = id => {
     setEditOrderId(id)
   }
 
-const handleSaveEdit = async () => {
-  setIsLoading(true);
+  const handleSaveEdit = async () => {
+    setIsLoading(true)
 
-  try {
-    const { error } = await supabase
-      .from(`${storeOrderId}`)
-      .update({ status: editOrderStatus })
-      .eq('id', editOrderId);
+    try {
+      const { error } = await supabase.from(`${storeOrderId}`).update({ status: editOrderStatus }).eq('id', editOrderId)
 
-    if (error) {
-      throw error;
+      if (error) {
+        throw error
+      }
+
+      setSuccess('Order updated successfully!')
+      setFailed('')
+      await fetchData()
+      setEditOrderId(null)
+      setAnchorEl(null)
+    } catch (error) {
+      console.error(error)
+      setFailed(error.message || 'Error updating order.')
+    } finally {
+      setIsLoading(false)
+
+      setTimeout(() => {
+        setSuccess('')
+      }, 3000)
     }
-
-    setSuccess('Order updated successfully!');
-    setFailed('');
-    await fetchData();
-    setEditOrderId(null);
-    setAnchorEl(null);
-  } catch (error) {
-    console.error(error);
-    setFailed(error.message || 'Error updating order.');
-  } finally {
-    setIsLoading(false);
-
-    setTimeout(() => {
-      setSuccess('');
-    }, 3000);
   }
-};
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage)
@@ -202,7 +225,32 @@ const handleSaveEdit = async () => {
         </Grid>
       )}
       <Grid item xs={12} md={4}>
-        <IntroHeading />
+        <Card>
+          <CardContent
+            sx={{
+              position: 'relative',
+              display: 'flex',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: '5px'
+            }}
+          >
+            <Typography variant='h5'>Orders</Typography>
+            <TriangleImg alt='triangle background' src={`/images/misc/${imageSrc}`} />
+            {/* Step 3: Add search bar with SearchIcon */}
+            <TextField
+              label='Search Reference ID'
+              variant='outlined'
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              InputProps={{
+                endAdornment: <SearchIcon onClick={handleSearch} sx={{ cursor: 'pointer' }} />
+              }}
+               sx={{ width: '230px' }}
+            />
+          </CardContent>
+        </Card>
       </Grid>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label='sticky table'>
