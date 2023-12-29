@@ -491,7 +491,7 @@ const FormLayoutsSeparator = () => {
                 </div>
               ))}
               <div className='flex items-center my-2'>
-                <Button onClick={handleAddSize} variant='outlined' size='small'>
+                <Button disabled={formDisabled} onClick={handleAddSize} variant='outlined' size='small'>
                   <AddRoundedIcon />
                   new size
                 </Button>
@@ -500,7 +500,7 @@ const FormLayoutsSeparator = () => {
           </Grid>
         </CardContent>
         <Divider sx={{ margin: 0 }} />
-        <CardActions>
+        <CardActions sx={{ display: 'flex', justifyContent: 'flex-end'}} >
           <LoadingButton
             loading={Boolean(isLoading)}
             disabled={isDisabled}
