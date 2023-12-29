@@ -62,11 +62,7 @@ const Drawer = props => {
       }}
     >
       {children}
-      <Grid item  sx={{ mb: 3 }}>
-            <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
-              <AlertTitle>PRODUCT IS IN BETA</AlertTitle>
-            </Alert>
-          </Grid>
+      
     </SwipeableDrawer>
   )
 }
