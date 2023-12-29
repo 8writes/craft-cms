@@ -57,7 +57,7 @@ const Intro = () => {
         setFailed(error.message)
       } else {
         handleUserUpdate()
-        setSuccess('Account activated Successfully!')
+        setSuccess('Storage initialized Successfully!')
       }
     } catch (error) {
       console.error('Error handling storage:', error.message)

@@ -135,32 +135,35 @@ const TableStickyHeader = () => {
     }
   };
 
-  // Delete product image from Supabase Storage
-  const deleteImage = async () => {
-    try {
-      // Modify the URLs to remove the dynamic part before the first "/"
+// Delete product image from Supabase Storage
+const deleteImage = async () => {
+  try {
+    // Modify the URLs to remove the dynamic part before the first "/"
       const modifiedUrls = imageUrls.map(url => {
         const firstSlashIndex = url.indexOf('/');
         
         return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url;
-      });
+      }); 
+    
+    // Call the remove method with the array of objects
+    const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls);
 
-      const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls);
-
-      if (error) {
-        console.log('send error to support:', error.message);
-      }
-    } catch (error) {
-      console.error('Error deleting images:', error.message);
+    if (error) {
+      console.log('send error to support:', error.message);
     }
-  };
+  } catch (error) {
+    console.error('Error deleting images:', error.message);
+  }
+};
+
 
   // Handle product deletion
-  const handleDelete = async id => {
-    await deleteImage();
+  const handleDelete = async (id) => {
+  
     setDeleteLoadingId(id);
 
     try {
+      await deleteImage();
       const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id);
 
       if (error) {

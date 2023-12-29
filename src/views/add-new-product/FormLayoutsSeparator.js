@@ -108,31 +108,34 @@ const FormLayoutsSeparator = () => {
   const subscription = userData?.user_metadata?.subscription
 
   const uploadImage = async index => {
-    try {
-      const file = selectedImages[index]
+  try {
+    const file = selectedImages[index];
 
-      if (!file === selectedImages[index]) {
-        return null
-      }
-
-      const { data, error } = await supabase.storage.from(`${storeName}`).upload(`${userId}/public/${uuidv4()}`, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
-
-      if (error) {
-        setFailed(error.message)
-      }
-
-      const url = data.fullPath
-
-      return url
-    } catch (error) {
-      console.error('An unexpected error occurred:', error.message)
-
-      return null
+    if (!file) {
+      return null;
     }
+
+    const { data, error } = await supabase.storage.from(storeName).upload(`${userId}/public/${uuidv4()}`, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+    if (error) {
+      setFailed(error.message);
+      console.error(error);
+      
+      return null;
+    }
+
+    const url = data.fullPath;
+
+    return url;
+  } catch (error) {
+    console.error('An unexpected error occurred:', error.message);
+
+    return null;
   }
+}
 
   // Function to handle form data insertion
   const handleUploadForm = async () => {
@@ -168,6 +171,8 @@ const FormLayoutsSeparator = () => {
       // Handle success or error
       if (error) {
         setFailed(error.message)
+
+        return
       } else {
         console.log(data)
         setFailed('')
@@ -439,15 +444,15 @@ const FormLayoutsSeparator = () => {
                   onChange={e => setProductTag(e.target.value)}
                 >
                   <MenuItem value=''>None</MenuItem>
-                  <MenuItem value='clothing&fashion'>Clothing and Fashion</MenuItem>
-                  <MenuItem value='footwear'>Footwear</MenuItem>
-                  <MenuItem value='accessories'>Accessories</MenuItem>
-                  <MenuItem value='electronics'>Electronics</MenuItem>
-                  <MenuItem value='pet&supply'>Pet Supply</MenuItem>
-                  <MenuItem value='home&living'>Home and Living</MenuItem>
-                  <MenuItem value='beauty&care'>Beauty and Personal Care</MenuItem>
-                  <MenuItem value='sports&outdoors'>Sports and Outdoors</MenuItem>
-                  <MenuItem value='books&music&media'>Books, Music and Media </MenuItem>
+                  <MenuItem value='Clothing Fashion'>Clothing and Fashion</MenuItem>
+                  <MenuItem value='Footwear'>Footwear</MenuItem>
+                  <MenuItem value='Accessories'>Accessories</MenuItem>
+                  <MenuItem value='Electronics'>Electronics</MenuItem>
+                  <MenuItem value='Pet Supply'>Pet Supply</MenuItem>
+                  <MenuItem value='Home Living'>Home and Living</MenuItem>
+                  <MenuItem value='Beauty Care'>Beauty and Personal Care</MenuItem>
+                  <MenuItem value='Sports Outdoors'>Sports and Outdoors</MenuItem>
+                  <MenuItem value='Books Music Media'>Books, Music and Media </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
