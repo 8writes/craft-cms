@@ -18,7 +18,7 @@ const TabAccountSetting = () => {
         <Grid container spacing={7}>
           <Grid item xs={12} sx={{ mb: 3 }}>
             <Alert severity='error' sx={{ '& a': { fontWeight: 400 } }}>
-              <AlertTitle> Account deactivation may take upto 24hrs.<br /> Your account cannot be recovered after deactivation.</AlertTitle>
+               Account deactivation may take upto 24hrs.<br /> Your account cannot be recovered after deactivation.
             </Alert>
           </Grid>
 

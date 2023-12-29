@@ -139,7 +139,7 @@ const TabSecurity = () => {
         </Box>
          <Grid item xs={12} sx={{ mt: 5 }}>
             <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
-              <AlertTitle>Currently unavailable.</AlertTitle>
+              Currently unavailable.
             </Alert>
           </Grid>
       </CardContent>

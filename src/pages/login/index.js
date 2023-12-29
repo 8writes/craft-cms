@@ -101,14 +101,14 @@ const LoginPage = () => {
       {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
           <Alert severity='success' sx={{ '& a': { fontWeight: 400 } }}>
-            <AlertTitle>{success}</AlertTitle>
+            <span className='text-white'> {success}</span>
           </Alert>
         </Grid>
       )}
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
           <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
-            <AlertTitle>{failed}</AlertTitle>
+             <span className='text-white'> {failed}</span>
           </Alert>
         </Grid>
       )}

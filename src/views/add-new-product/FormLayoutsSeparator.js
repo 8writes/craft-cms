@@ -108,34 +108,34 @@ const FormLayoutsSeparator = () => {
   const subscription = userData?.user_metadata?.subscription
 
   const uploadImage = async index => {
-  try {
-    const file = selectedImages[index];
+    try {
+      const file = selectedImages[index]
 
-    if (!file) {
-      return null;
+      if (!file) {
+        return null
+      }
+
+      const { data, error } = await supabase.storage.from(storeName).upload(`${userId}/public/${uuidv4()}`, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+
+      if (error) {
+        setFailed(error.message)
+        console.error(error)
+
+        return null
+      }
+
+      const url = data.fullPath
+
+      return url
+    } catch (error) {
+      console.error('An unexpected error occurred:', error.message)
+
+      return null
     }
-
-    const { data, error } = await supabase.storage.from(storeName).upload(`${userId}/public/${uuidv4()}`, file, {
-      cacheControl: '3600',
-      upsert: false
-    });
-
-    if (error) {
-      setFailed(error.message);
-      console.error(error);
-      
-      return null;
-    }
-
-    const url = data.fullPath;
-
-    return url;
-  } catch (error) {
-    console.error('An unexpected error occurred:', error.message);
-
-    return null;
   }
-}
 
   // Function to handle form data insertion
   const handleUploadForm = async () => {
@@ -171,12 +171,12 @@ const FormLayoutsSeparator = () => {
       // Handle success or error
       if (error) {
         setFailed(error.message)
-
+        
         return
       } else {
-        console.log(data)
         setFailed('')
         setSuccess('Product Uploaded successfully!')
+         clearForm();
       }
     } catch (error) {
       setFailed(error.message)
@@ -184,28 +184,25 @@ const FormLayoutsSeparator = () => {
     }
   }
 
- // Function to fetch product count
+  // Function to fetch product count
   const handleDataCount = async () => {
     try {
-      const { data, error } = await supabase.from(`${storeName}`).select();
+      const { data, error } = await supabase.from(`${storeName}`).select()
 
       if (error) {
-
       } else {
         // Check for product data and calculate product count
-        const dataCount = data ? data.length : 0;
+        const dataCount = data ? data.length : 0
 
-        setProductCount(dataCount);
+        setProductCount(dataCount)
       }
-    } catch (error) {
-    }
-  };
+    } catch (error) {}
+  }
 
   // Fetch product count on component mount
   useEffect(() => {
-    handleDataCount();
-  }, [storeName]); // Trigger the effect when storeName changes
-
+    handleDataCount()
+  }, [storeName]) // Trigger the effect when storeName changes
 
   // Function to handle the overall upload process
   const handleUpload = async () => {
@@ -217,7 +214,7 @@ const FormLayoutsSeparator = () => {
       const { data, error } = await supabase.auth.getUser()
 
       if (error) {
-        throw new Error(error.message)
+        setFailed(error.message)
       }
 
       let subscriptionLimit
@@ -246,22 +243,23 @@ const FormLayoutsSeparator = () => {
         return
       } else {
         await handleUploadForm()
-        handleDataCount();
+        handleDataCount()
       }
+    
     } catch (error) {
       console.error('An unexpected error occurred:', error.message)
+      
     } finally {
-      // Reset success and failure after a delay
-      setTimeout(() => {
-        setSuccess('')
-      }, 8000)
+    // Reset success and failure after a delay
+    setTimeout(() => {
+      setSuccess('');
+      setFailed('');
+    }, 8000);
 
-      clearForm()
-
-      setFormDisabled(false)
-      setLoading(false)
-    }
+    setFormDisabled(false);
+    setLoading(false);
   }
+}
 
   // Function to clear form fields
   const clearForm = () => {
@@ -296,18 +294,16 @@ const FormLayoutsSeparator = () => {
     <Card>
       {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
-          <Alert variant='filled' severity='success' sx={{ '& a': { fontWeight: 500 } }}>
-            <AlertTitle>{success}</AlertTitle>
+          <Alert variant='filled' severity='success' sx={{ '& a': { fontWeight: 500, color: 'white' } }}>
+            <span className='text-white'> {success}</span>
           </Alert>
         </Grid>
       )}
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
           <Alert variant='filled' severity='error' sx={{ '& a': { fontWeight: 500 } }}>
-            <AlertTitle>
-              {failed}
-              <CloseRoundedIcon className=' cursor-pointer  mx-2' onClick={() => setFailed('')} />
-            </AlertTitle>
+            <span className='text-white'>{failed}</span>
+            <CloseRoundedIcon className=' cursor-pointer  mx-2' onClick={() => setFailed('')} />
           </Alert>
         </Grid>
       )}
@@ -500,7 +496,7 @@ const FormLayoutsSeparator = () => {
           </Grid>
         </CardContent>
         <Divider sx={{ margin: 0 }} />
-        <CardActions sx={{ display: 'flex', justifyContent: 'flex-end'}} >
+        <CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <LoadingButton
             loading={Boolean(isLoading)}
             disabled={isDisabled}

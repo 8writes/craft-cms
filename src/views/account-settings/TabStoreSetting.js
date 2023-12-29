@@ -76,13 +76,14 @@ const StoreSetting = () => {
        {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
           <Alert variant='filled' severity='success' sx={{ '& a': { fontWeight: 500 } }}>
-            <AlertTitle>{success}</AlertTitle>
+            <span className='text-white'> {success}</span>
           </Alert>
         </Grid>
       )}
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
           <Alert variant='filled' severity='error' sx={{ '& a': { fontWeight: 500 } }}>
+            <span className='text-white'> {failed}</span>
             <CloseRoundedIcon className=' cursor-pointer  mx-2' onClick={() => setFailed('')} />
           </Alert>
         </Grid>
@@ -106,13 +107,13 @@ const StoreSetting = () => {
 
             {userStatus ? (<Grid item xs={12} sx={{ mt: 5 }}>
               <Alert severity='success' sx={{ '& a': { fontWeight: 400 } }}>
-                <AlertTitle>Your store is activated!</AlertTitle>
+                Your store is activated!
               </Alert>
             </Grid>) : (
             
               <Grid item xs={12} sx={{ mt: 5 }}>
                 <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
-                  <AlertTitle>Kindly activate your store <span className='cursor-pointer underline' onClick={handleStorage}>Here</span></AlertTitle>
+                  Kindly activate your store <span className='cursor-pointer underline' onClick={handleStorage}>Here</span>
                 </Alert>
               </Grid>
             )}

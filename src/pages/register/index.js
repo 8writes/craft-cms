@@ -150,14 +150,14 @@ const RegisterPage = () => {
       {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
           <Alert severity='success' sx={{ '& a': { fontWeight: 400 } }}>
-            <AlertTitle>Account created successfully</AlertTitle>
+            Account created successfully
           </Alert>
         </Grid>
       )}
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
           <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
-            <AlertTitle>An account with this email exist</AlertTitle>
+            An account with this email exist
           </Alert>
         </Grid>
       )}
