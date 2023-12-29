@@ -86,10 +86,10 @@ const Navigation = props => {
       <StyledBoxForShadow
         ref={shadowRef}
         sx={{
-          background: `linear-gradient(${theme.palette.background.default} 40%,${hexToRGBA(
+          background: `linear-gradient(${theme.palette.background.default} 0%,${hexToRGBA(
             theme.palette.background.default,
             0.1
-          )} 95%,${hexToRGBA(theme.palette.background.default, 0.05)})`
+          )} 0%,${hexToRGBA(theme.palette.background.default, 0.05)})`
         }}
       />
       <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden' }}>
