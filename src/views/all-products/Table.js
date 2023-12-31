@@ -104,87 +104,85 @@ const TableStickyHeader = () => {
   const storeName = userData?.user_metadata?.store_name
 
   // Fetch product data from Supabase
-  const fetchData = async () => {
-    setSuspense(true)
+const fetchData = async () => {
+  setSuspense(true);
 
-    try {
-      const { data, error } = await supabase.from(`${storeName}`).select()
+  try {
+    const { data, error } = await supabase.from(`${storeName}`).select();
 
-      if (error) {
-        throw error
-      }
-
-      // Reset the id counter
-      idCounter = 0
-
-      // Update the id field with sequential count and add image URL
-      const formattedData = data.map(item => ({
-        ...item,
-        sn: ++idCounter,
-        image: item.uploadedImageUrls // Assuming uploadedImageUrls is an array of image URLs
-      }))
-
-      const urls = data[0]?.uploadedImageUrls
-
-      setImageUrl(urls)
-      setTableData(formattedData)
-    } catch (error) {
-      console.error('Error fetching data:', error.message)
-    } finally {
-      setSuspense(false)
+    if (error) {
+      throw error;
     }
+
+    // Reset the id counter
+    let idCounter = 0;
+
+    // Update the id field with sequential count and add image URL
+    const formattedData = data.map(item => ({
+      ...item,
+      sn: ++idCounter,
+      image: item.uploadedImageUrls // Assuming uploadedImageUrls is an array of image URLs
+    }));
+
+    setImageUrl(formattedData.map(item => item.image));
+    setTableData(formattedData);
+  } catch (error) {
+    console.error('Error fetching data:', error.message);
+  } finally {
+    setSuspense(false);
   }
+};
 
-  // Delete product image from Supabase Storage
-  const deleteImage = async () => {
-    try {
-      // Modify the URLs to remove the dynamic part before the first "/"
-      const modifiedUrls = imageUrls.map(url => {
-        const firstSlashIndex = url.indexOf('/')
-
-        return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url
-      })
-
-      // Call the remove method with the array of objects
-      const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls)
-
-      if (error) {
-        console.log('send error to support:', error.message)
-      }
-    } catch (error) {
-      console.error('Error deleting images:', error.message)
-    }
-  }
-
-  // Handle product deletion
   const handleDelete = async id => {
-    setDeleteLoadingId(id)
+  setDeleteLoadingId(id);
 
-    try {
-      await deleteImage()
-      const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id)
+  try {
+    const productToDelete = tableData.find(product => product.id === id);
+    await deleteImage(productToDelete.image); // Pass the image URLs to deleteImage function
 
-      if (error) {
-        setFailed(error.message)
-      } else {
-        setFailed('')
-        setSuccess('Product deleted successfully!')
-      }
-      setDeleteProductId(null)
-      setEditProductId(null)
-      setAnchorEl(null)
-    } catch (error) {
-      setFailed('Network error')
-    } finally {
-      setDeleteLoadingId(null)
-      fetchData()
+    const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id);
 
-      // Reset success and failure after a delay
-      setTimeout(() => {
-        setSuccess('')
-      }, 3000)
+    if (error) {
+      setFailed(error.message);
+    } else {
+      setFailed('');
+      setSuccess('Product deleted successfully!');
     }
+    setDeleteProductId(null);
+    setEditProductId(null);
+    setAnchorEl(null);
+  } catch (error) {
+    setFailed('Network error');
+  } finally {
+    setDeleteLoadingId(null);
+    fetchData();
+
+    // Reset success and failure after a delay
+    setTimeout(() => {
+      setSuccess('');
+    }, 3000);
   }
+  };
+  
+const deleteImage = async imageUrls => {
+  try {
+    // Modify the URLs to remove the dynamic part before the first "/"
+    const modifiedUrls = imageUrls.map(url => {
+      const firstSlashIndex = url.indexOf('/');
+      
+      return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url;
+    });
+
+    // Call the remove method with the array of objects
+    const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls);
+
+    if (error) {
+      console.log('send error to support:', error.message);
+    }
+  } catch (error) {
+    console.error('Error deleting images:', error.message);
+  }
+};
 
   // Handle product edit
   const handleEdit = (id, price, stock) => {
