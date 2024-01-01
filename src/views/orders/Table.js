@@ -31,8 +31,6 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-let idCounter = 0
-
 const columns = [
   { id: 'sn', label: 'S/N' },
   { id: 'fullName', label: 'Name' },
@@ -45,17 +43,19 @@ const columns = [
 ]
 
 const TableStickyHeader = () => {
-  const userData = useUser()
-  const [success, setSuccess] = useState('')
-  const [failed, setFailed] = useState('')
-  const [suspense, setSuspense] = useState('')
-  const [isLoading, setIsLoading] = useState('')
-  const [deleteLoadingId, setDeleteLoadingId] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
+  const userData = useUser();
+  const [success, setSuccess] = useState('');
+  const [failed, setFailed] = useState('');
+  const [suspense, setSuspense] = useState('');
+  const [isLoading, setIsLoading] = useState('');
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [normalData, setNormalData] = useState([]);
+  const [searchData, setSearchData] = useState([]);
 
   // ** Hook
-  const theme = useTheme()
-  const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
+  const theme = useTheme();
+  const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png';
 
   // Styled component for the triangle shaped background image
   const TriangleImg = styled('img')({
@@ -63,135 +63,149 @@ const TableStickyHeader = () => {
     bottom: 0,
     height: 170,
     position: 'absolute'
-  })
+  });
 
   // States for edit functionality
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [tableData, setTableData] = useState([])
-  const [userId, setUserId] = useState('')
-  const [editOrderId, setEditOrderId] = useState(0)
-  const [editOrderStatus, setEditOrderStatus] = useState('')
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [userId, setUserId] = useState('');
+  const [editOrderId, setEditOrderId] = useState(null);
+  const [editOrderStatus, setEditOrderStatus] = useState('');
 
+  const [editProductId, setEditProductId] = useState(null)
+
+  const [deleteProductId, setDeleteProductId] = useState(null)
+  
   // States for popover
-  // States for popover
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState(null);
 
   // Function to handle the opening of the popover
-  const handlePopoverOpen = event => {
-    setAnchorEl(event.currentTarget)
-  }
+  const handlePopoverOpen = (event, id) => {
+    setAnchorEl(event.currentTarget);
+   setDeleteProductId(id)
+  };
 
   // Function to handle the closing of the popover
   const handlePopoverClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+     setDeleteProductId(null)
+  };
+
 
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data } = await supabase.auth.getUser()
-        const userId = data?.user?.id || ''
-        setUserId(userId)
+        const { data } = await supabase.auth.getUser();
+        const userId = data?.user?.id || '';
+        setUserId(userId);
       } catch (e) {
-        console.error('Error getting user:', e)
+        console.error('Error getting user:', e);
       }
-    }
+    };
 
     if (userData?.user_metadata?.store_name) {
-      getUser()
-      fetchData()
+      getUser();
+      fetchData();
     }
-  }, [userData?.user_metadata?.store_name])
+  }, [userData?.user_metadata?.store_name]);
 
-  const storeOrderId = userData?.user_metadata?.store_orderId
+  const storeOrderId = userData?.user_metadata?.store_orderId;
 
   const fetchData = async () => {
-    setSuspense(true)
+    setSuspense(true);
     try {
-      const { data, error } = await supabase.from(`${storeOrderId}`).select()
+      const { data, error } = await supabase.from(`${storeOrderId}`).select();
 
       if (error) {
-        throw error
+        throw error;
       }
 
-      idCounter = 0
+      // Reset the id counter
+    let idCounter = 0;
 
       const formattedData = data.map(item => ({
         ...item,
-        sn: ++idCounter,
-        image: item.uploadedImageUrl
-      }))
+         sn: ++idCounter,
+      }));
+
+      setNormalData(formattedData);
 
       const filteredData = formattedData.filter(
         item =>
-          item.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.reference.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      );
 
-      setTableData(filteredData)
+      setSearchData(filteredData);
     } catch (error) {
-      console.error(error)
-      setFailed(error.message)
+      console.error(error);
+      setFailed(error.message);
     } finally {
-      setSuspense(false)
+      setSuspense(false);
     }
-  }
+  };
 
-  const handleSearch = () => {
-    fetchData() // Trigger fetch data with the search term
-  }
+  const handleSearch = (id) => {
+    fetchData(id); // Trigger fetch data with the search term
+  };
 
   const handleDelete = async id => {
-    setDeleteLoadingId(id)
+  setDeleteLoadingId(id);
 
     try {
-      const { error } = await supabase.from(`${storeOrderId}`).delete().eq('id', id)
+    
+    const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id);
 
-      if (error) {
-        throw error
-      }
-
-      setSuccess('Order deleted successfully!')
-    } catch (error) {
-      console.error(error)
-      setFailed(error.message || 'Error deleting order.')
-    } finally {
-      setDeleteLoadingId(null)
-      setAnchorEl(null)
-      fetchData() // Refetch data after deletion
-
-      setTimeout(() => {
-        setSuccess('')
-      }, 3000)
+    if (error) {
+      setFailed(error.message);
+    } else {
+      setFailed('');
+      setSuccess('Product deleted successfully!');
     }
+    setDeleteProductId(null);
+    setEditProductId(null);
+    setAnchorEl(null);
+  } catch (error) {
+    setFailed('Network error');
+  } finally {
+    setDeleteLoadingId(null);
+    fetchData();
+
+    // Reset success and failure after a delay
+    setTimeout(() => {
+      setSuccess('');
+    }, 3000);
   }
+  };
 
   const handleEdit = id => {
-    setEditOrderId(id)
+    setEditProductId(id)
   }
 
+  // Handle saving edited product
   const handleSaveEdit = async () => {
     setIsLoading(true)
-
     try {
-      const { error } = await supabase.from(`${storeOrderId}`).update({ status: editOrderStatus }).eq('id', editOrderId)
+      const { error } = await supabase
+        .from(`${storeOrderId}`)
+        .update({ status: editOrderStatus, })
+        .eq('id', editProductId)
 
       if (error) {
-        throw error
+        setFailed(error.message)
+      } else {
+        setSuccess('Product updated successfully!')
       }
 
-      setSuccess('Order updated successfully!')
-      setFailed('')
       await fetchData()
-      setEditOrderId(null)
+      setDeleteProductId(null)
+      setEditProductId(null)
       setAnchorEl(null)
     } catch (error) {
-      console.error(error)
-      setFailed(error.message || 'Error updating order.')
+      console.error('Error updating data:', error.message)
     } finally {
       setIsLoading(false)
 
+      // Reset success and failure after a delay
       setTimeout(() => {
         setSuccess('')
       }, 3000)
@@ -207,6 +221,9 @@ const TableStickyHeader = () => {
     setPage(0)
   }
 
+   // Determine which data to use based on whether a search is active
+  const dataToUse = searchTerm.length > 0 ? searchData : normalData;
+ 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       {success && (
@@ -279,8 +296,8 @@ const TableStickyHeader = () => {
             </TableBody>
           ) : (
             <>
-              <TableBody>
-                {tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
+            <TableBody>
+                {dataToUse.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
                   <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
                     {columns.map(column => (
                       <TableCell key={column.id} align={column.align}>
@@ -298,14 +315,14 @@ const TableStickyHeader = () => {
                     ))}
                     <TableCell>
                       <MoreVertIcon
-                        onClick={handlePopoverOpen}
+                         onClick={event => handlePopoverOpen(event, row.id)} 
                         aria-controls={Boolean(anchorEl) ? 'edit-delete-popover' : undefined}
                         aria-haspopup='true'
                         sx={{ cursor: 'pointer' }}
                       />
                       <Popover
                         id='edit-delete-popover'
-                        open={Boolean(anchorEl)}
+                        open={Boolean(anchorEl && deleteProductId === row.id)}
                         anchorEl={anchorEl}
                         onClose={handlePopoverClose}
                         anchorOrigin={{
@@ -330,7 +347,7 @@ const TableStickyHeader = () => {
           )}
         </Table>
 
-        {tableData.length === 0 && !suspense && (
+        {dataToUse.length === 0 && !suspense && (
           <div className='text-center my-10'>
             <Typography variant='h4' className='text-slate-100'>
               No orders yet.
@@ -340,9 +357,9 @@ const TableStickyHeader = () => {
       </TableContainer>
 
       {/* Edit Dialog */}
-      <Dialog open={Boolean(editOrderId)} onClose={() => setEditOrderId(null)}>
+      <Dialog open={Boolean(editProductId)} onClose={() => setEditProductId(null)}>
         <DialogTitle className='flex justify-between items-center'>
-          Update Order <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setEditOrderId(null)} />
+          Update Order <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setEditProductId(null)} />
         </DialogTitle>
         <DialogContent className='grid gap-5'>
           <Grid item xs={12} sm={3}></Grid>
@@ -374,7 +391,7 @@ const TableStickyHeader = () => {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={tableData.length}
+        count={dataToUse.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
