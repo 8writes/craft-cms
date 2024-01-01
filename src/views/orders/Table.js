@@ -21,6 +21,7 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import { styled, useTheme } from '@mui/material/styles'
 import SearchIcon from '@mui/icons-material/Search'
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { useUser } from 'src/@core/context/userDataContext'
 
@@ -250,22 +251,23 @@ const TableStickyHeader = () => {
               justifyContent: 'space-between',
               flexWrap: 'wrap',
               alignItems: 'center',
-              gap: '5px'
+              gap: '1px'
             }}
           >
             <Typography variant='h5'>Orders</Typography>
-            <TriangleImg alt='triangle background' src={`/images/misc/${imageSrc}`} />
             {/* Step 3: Add search bar with SearchIcon */}
             <TextField
-              label='Search Reference ID'
+              label='Reference ID'
               variant='outlined'
               value={searchTerm}
+              autoComplete='off'
+              className=' md:w-3/6 w-4/6'
               onChange={e => setSearchTerm(e.target.value)}
               InputProps={{
                 endAdornment: <SearchIcon onClick={handleSearch} sx={{ cursor: 'pointer' }} />
               }}
-              sx={{ width: '230px' }}
             />
+            <RefreshIcon className='cursor-pointer' onClick={fetchData} />
           </CardContent>
         </Card>
       </Grid>
