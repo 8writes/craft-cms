@@ -43,19 +43,19 @@ const columns = [
 ]
 
 const TableStickyHeader = () => {
-  const userData = useUser();
-  const [success, setSuccess] = useState('');
-  const [failed, setFailed] = useState('');
-  const [suspense, setSuspense] = useState('');
-  const [isLoading, setIsLoading] = useState('');
-  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [normalData, setNormalData] = useState([]);
-  const [searchData, setSearchData] = useState([]);
+  const userData = useUser()
+  const [success, setSuccess] = useState('')
+  const [failed, setFailed] = useState('')
+  const [suspense, setSuspense] = useState('')
+  const [isLoading, setIsLoading] = useState('')
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [normalData, setNormalData] = useState([])
+  const [searchData, setSearchData] = useState([])
 
   // ** Hook
-  const theme = useTheme();
-  const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png';
+  const theme = useTheme()
+  const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
 
   // Styled component for the triangle shaped background image
   const TriangleImg = styled('img')({
@@ -63,119 +63,119 @@ const TableStickyHeader = () => {
     bottom: 0,
     height: 170,
     position: 'absolute'
-  });
+  })
 
   // States for edit functionality
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [userId, setUserId] = useState('');
-  const [editOrderId, setEditOrderId] = useState(null);
-  const [editOrderStatus, setEditOrderStatus] = useState('');
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [userId, setUserId] = useState('')
+
+  const [editOrderStatus, setEditOrderStatus] = useState(0)
 
   const [editProductId, setEditProductId] = useState(null)
-
   const [deleteProductId, setDeleteProductId] = useState(null)
-  
+  const [detailsDialogId, setDetailsDialogId] = useState(null)
+
   // States for popover
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null)
 
   // Function to handle the opening of the popover
   const handlePopoverOpen = (event, id) => {
-    setAnchorEl(event.currentTarget);
-   setDeleteProductId(id)
-  };
+    setAnchorEl(event.currentTarget)
+    setDeleteProductId(id)
+  }
 
   // Function to handle the closing of the popover
   const handlePopoverClose = () => {
-    setAnchorEl(null);
-     setDeleteProductId(null)
-  };
-
+    setAnchorEl(null)
+    setDeleteProductId(null)
+  }
 
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data } = await supabase.auth.getUser();
-        const userId = data?.user?.id || '';
-        setUserId(userId);
+        const { data } = await supabase.auth.getUser()
+        const userId = data?.user?.id || ''
+        setUserId(userId)
       } catch (e) {
-        console.error('Error getting user:', e);
+        console.error('Error getting user:', e)
       }
-    };
+    }
 
     if (userData?.user_metadata?.store_name) {
-      getUser();
-      fetchData();
+      getUser()
+      fetchData()
     }
-  }, [userData?.user_metadata?.store_name]);
+  }, [userData?.user_metadata?.store_name])
 
-  const storeOrderId = userData?.user_metadata?.store_orderId;
+  const storeOrderId = userData?.user_metadata?.store_orderId
 
   const fetchData = async () => {
-    setSuspense(true);
+    setSuspense(true)
     try {
-      const { data, error } = await supabase.from(`${storeOrderId}`).select();
+      const { data, error } = await supabase.from(`${storeOrderId}`).select()
 
       if (error) {
-        throw error;
+        throw error
       }
 
       // Reset the id counter
-    let idCounter = 0;
+      let idCounter = 0
 
       const formattedData = data.map(item => ({
         ...item,
-         sn: ++idCounter,
-      }));
+        sn: ++idCounter
+      }))
 
-      setNormalData(formattedData);
+      setNormalData(formattedData)
 
-      const filteredData = formattedData.filter(
-        item =>
-          item.reference.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const filteredData = formattedData.filter(item => item.reference.toLowerCase().includes(searchTerm.toLowerCase()))
 
-      setSearchData(filteredData);
+      setSearchData(filteredData)
     } catch (error) {
-      console.error(error);
-      setFailed(error.message);
+      console.error(error)
+      setFailed(error.message)
     } finally {
-      setSuspense(false);
+      setSuspense(false)
     }
-  };
+  }
 
-  const handleSearch = (id) => {
-    fetchData(id); // Trigger fetch data with the search term
-  };
+  const handleSearch = id => {
+    fetchData(id) // Trigger fetch data with the search term
+  }
 
   const handleDelete = async id => {
-  setDeleteLoadingId(id);
+    setDeleteLoadingId(id)
 
     try {
-    
-    const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id);
+      const { error } = await supabase.from(`${storeOrderId}`).delete().eq('user_id', userId).eq('id', id)
 
-    if (error) {
-      setFailed(error.message);
-    } else {
-      setFailed('');
-      setSuccess('Product deleted successfully!');
+      if (error) {
+        setFailed(error.message)
+      } else {
+        setFailed('')
+        setSuccess('Product deleted successfully!')
+      }
+      setDeleteProductId(null)
+      setEditProductId(null)
+      setAnchorEl(null)
+    } catch (error) {
+      setFailed('Network error')
+    } finally {
+      setDeleteLoadingId(null)
+      fetchData()
+
+      // Reset success and failure after a delay
+      setTimeout(() => {
+        setSuccess('')
+      }, 3000)
     }
-    setDeleteProductId(null);
-    setEditProductId(null);
-    setAnchorEl(null);
-  } catch (error) {
-    setFailed('Network error');
-  } finally {
-    setDeleteLoadingId(null);
-    fetchData();
-
-    // Reset success and failure after a delay
-    setTimeout(() => {
-      setSuccess('');
-    }, 3000);
   }
-  };
+
+  // Function to handle opening the details dialog
+  const handleDetails = row => {
+    setDetailsDialogId(row)
+  }
 
   const handleEdit = id => {
     setEditProductId(id)
@@ -187,7 +187,7 @@ const TableStickyHeader = () => {
     try {
       const { error } = await supabase
         .from(`${storeOrderId}`)
-        .update({ status: editOrderStatus, })
+        .update({ status: editOrderStatus })
         .eq('id', editProductId)
 
       if (error) {
@@ -221,9 +221,9 @@ const TableStickyHeader = () => {
     setPage(0)
   }
 
-   // Determine which data to use based on whether a search is active
-  const dataToUse = searchTerm.length > 0 ? searchData : normalData;
- 
+  // Determine which data to use based on whether a search is active
+  const dataToUse = searchTerm.length > 0 ? searchData : normalData
+
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       {success && (
@@ -264,7 +264,7 @@ const TableStickyHeader = () => {
               InputProps={{
                 endAdornment: <SearchIcon onClick={handleSearch} sx={{ cursor: 'pointer' }} />
               }}
-               sx={{ width: '230px' }}
+              sx={{ width: '230px' }}
             />
           </CardContent>
         </Card>
@@ -296,7 +296,7 @@ const TableStickyHeader = () => {
             </TableBody>
           ) : (
             <>
-            <TableBody>
+              <TableBody>
                 {dataToUse.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
                   <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
                     {columns.map(column => (
@@ -315,7 +315,7 @@ const TableStickyHeader = () => {
                     ))}
                     <TableCell>
                       <MoreVertIcon
-                         onClick={event => handlePopoverOpen(event, row.id)} 
+                        onClick={event => handlePopoverOpen(event, row.id)}
                         aria-controls={Boolean(anchorEl) ? 'edit-delete-popover' : undefined}
                         aria-haspopup='true'
                         sx={{ cursor: 'pointer' }}
@@ -326,7 +326,7 @@ const TableStickyHeader = () => {
                         anchorEl={anchorEl}
                         onClose={handlePopoverClose}
                         anchorOrigin={{
-                          vertical: 'bottom',
+                          vertical: 'top',
                           horizontal: 'center'
                         }}
                         transformOrigin={{
@@ -334,6 +334,7 @@ const TableStickyHeader = () => {
                           horizontal: 'center'
                         }}
                       >
+                        <MenuItem onClick={() => handleDetails(row)}>Details</MenuItem>
                         <MenuItem onClick={() => handleEdit(row.id)}>Update</MenuItem>
                         <MenuItem onClick={() => handleDelete(row.id)} disabled={Boolean(deleteLoadingId === row.id)}>
                           Delete
@@ -387,7 +388,49 @@ const TableStickyHeader = () => {
           </LoadingButton>
         </DialogActions>
       </Dialog>
-
+      {/* Details Dialog */}
+      <Dialog open={detailsDialogId} onClose={() => setDetailsDialogId(false)}>
+        <DialogTitle className='flex justify-between items-center'>
+          Order Details <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setDetailsDialogId(false)} />
+        </DialogTitle>
+        <DialogContent className='grid gap-5'>
+          {/* Render additional details from the selectedRow */}
+          {detailsDialogId && (
+            <Grid container spacing={2}>
+              <Grid item xs={12} sx={{display: 'flex', justifyContent: 'space-between'}}>
+                <Typography variant='body1'>{`Name: ${detailsDialogId?.fullName || ''}`}</Typography>
+                 <Typography variant='body1'>{`${detailsDialogId?.orderDate || ''}`}</Typography>
+              </Grid>
+               <Grid item xs={12}>
+                <Typography variant='body1'>{`Email Address: ${detailsDialogId?.email || ''}`}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant='body1'>{`Reference ID: ${detailsDialogId?.reference || ''}`}</Typography>
+              </Grid>
+             <Grid item xs={12}>
+                <Typography variant='body1'>{`Phone Number: ${detailsDialogId?.phoneNumber || ''}`}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant='body1'>{`Cart: ${detailsDialogId?.orderInfo || ''}`}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant='body1'>{`Address: ${detailsDialogId?.address || ''}`}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant='body1'>{`Note: ${detailsDialogId?.note || ''}`}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant='body1'>{`Total Amount: ₦${
+                  detailsDialogId?.price?.toLocaleString('en-US') || ''
+                }`}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant='body1'>{`Status: ${detailsDialogId?.status || ''}`}</Typography>
+              </Grid>
+            </Grid>
+          )}
+        </DialogContent>
+      </Dialog>
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
