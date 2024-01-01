@@ -267,7 +267,7 @@ const TableStickyHeader = () => {
                 endAdornment: <SearchIcon onClick={handleSearch} sx={{ cursor: 'pointer' }} />
               }}
             />
-            <RefreshIcon className='cursor-pointer' onClick={fetchData} />
+            <RefreshIcon className='cursor-pointer md:mr-10' onClick={fetchData} />
           </CardContent>
         </Card>
       </Grid>

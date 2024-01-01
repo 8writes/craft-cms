@@ -11,7 +11,19 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
-import { Alert, AlertTitle, FormControl, InputLabel, MenuItem, Select, Skeleton, Typography } from '@mui/material'
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Skeleton,
+  Typography
+} from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import Dialog from '@mui/material/Dialog'
@@ -21,11 +33,13 @@ import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
 import MoreVertIcon from '@mui/icons-material/MoreVert' // <-- Import MoreVertIcon
 import Popover from '@mui/material/Popover'
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import RefreshIcon from '@mui/icons-material/Refresh'
 
 import { useUser } from 'src/@core/context/userDataContext'
-import IntroHeading from './Header'
 
 import { createClient } from '@supabase/supabase-js'
+import Link from 'next/link'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -104,85 +118,85 @@ const TableStickyHeader = () => {
   const storeName = userData?.user_metadata?.store_name
 
   // Fetch product data from Supabase
-const fetchData = async () => {
-  setSuspense(true);
+  const fetchData = async () => {
+    setSuspense(true)
 
-  try {
-    const { data, error } = await supabase.from(`${storeName}`).select();
+    try {
+      const { data, error } = await supabase.from(`${storeName}`).select()
 
-    if (error) {
-      throw error;
+      if (error) {
+        throw error
+      }
+
+      // Reset the id counter
+      let idCounter = 0
+
+      // Update the id field with sequential count and add image URL
+      const formattedData = data.map(item => ({
+        ...item,
+        sn: ++idCounter,
+        image: item.uploadedImageUrls // Assuming uploadedImageUrls is an array of image URLs
+      }))
+
+      setImageUrl(formattedData.map(item => item.image))
+      setTableData(formattedData)
+    } catch (error) {
+      console.error('Error fetching data:', error.message)
+    } finally {
+      setSuspense(false)
     }
-
-    // Reset the id counter
-    let idCounter = 0;
-
-    // Update the id field with sequential count and add image URL
-    const formattedData = data.map(item => ({
-      ...item,
-      sn: ++idCounter,
-      image: item.uploadedImageUrls // Assuming uploadedImageUrls is an array of image URLs
-    }));
-
-    setImageUrl(formattedData.map(item => item.image));
-    setTableData(formattedData);
-  } catch (error) {
-    console.error('Error fetching data:', error.message);
-  } finally {
-    setSuspense(false);
   }
-};
 
   const handleDelete = async id => {
-  setDeleteLoadingId(id);
+    setDeleteLoadingId(id)
 
-  try {
-    const productToDelete = tableData.find(product => product.id === id);
-    await deleteImage(productToDelete.image); // Pass the image URLs to deleteImage function
+    try {
+      const productToDelete = tableData.find(product => product.id === id)
+      await deleteImage(productToDelete.image) // Pass the image URLs to deleteImage function
 
-    const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id);
+      const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id)
 
-    if (error) {
-      setFailed(error.message);
-    } else {
-      setFailed('');
-      setSuccess('Product deleted successfully!');
+      if (error) {
+        setFailed(error.message)
+      } else {
+        setFailed('')
+        setSuccess('Product deleted successfully!')
+      }
+      setDeleteProductId(null)
+      setEditProductId(null)
+      setAnchorEl(null)
+    } catch (error) {
+      setFailed('Network error')
+    } finally {
+      setDeleteLoadingId(null)
+      fetchData()
+
+      // Reset success and failure after a delay
+      setTimeout(() => {
+        setSuccess('')
+      }, 3000)
     }
-    setDeleteProductId(null);
-    setEditProductId(null);
-    setAnchorEl(null);
-  } catch (error) {
-    setFailed('Network error');
-  } finally {
-    setDeleteLoadingId(null);
-    fetchData();
-
-    // Reset success and failure after a delay
-    setTimeout(() => {
-      setSuccess('');
-    }, 3000);
   }
-  };
-  
-const deleteImage = async imageUrls => {
-  try {
-    // Modify the URLs to remove the dynamic part before the first "/"
-    const modifiedUrls = imageUrls.map(url => {
-      const firstSlashIndex = url.indexOf('/');
-      
-      return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url;
-    });
 
-    // Call the remove method with the array of objects
-    const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls);
+  const deleteImage = async imageUrls => {
+    try {
+      // Modify the URLs to remove the dynamic part before the first "/"
+      const modifiedUrls = imageUrls.map(url => {
+        const firstSlashIndex = url.indexOf('/')
 
-    if (error) {
-      console.log('send error to support:', error.message);
+        return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url
+      })
+
+      // Call the remove method with the array of objects
+      const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls)
+
+      if (error) {
+        console.log('send error to support:', error.message)
+      }
+    } catch (error) {
+      console.error('Error deleting images:', error.message)
     }
-  } catch (error) {
-    console.error('Error deleting images:', error.message);
   }
-};
 
   // Handle product edit
   const handleEdit = (id, price, stock) => {
@@ -246,13 +260,35 @@ const deleteImage = async imageUrls => {
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
           <Alert variant='filled' severity='error' sx={{ '& a': { fontWeight: 500 } }}>
-             <span className='text-white'> {failed}</span>
+            <span className='text-white'> {failed}</span>
             <CloseRoundedIcon className=' cursor-pointer  mx-2' onClick={() => setFailed('')} />
           </Alert>
         </Grid>
       )}
       <Grid item xs={12} md={4}>
-        <IntroHeading />
+        <Card>
+          <CardContent
+            sx={{
+              position: 'relative',
+              display: 'flex',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: '1px'
+            }}
+          >
+            <Typography variant='h5'>Products</Typography>
+            <div className='flex gap-2 items-center'>
+              
+              <Link href='/add-new-product' passHref>
+                <Button size='medium' variant='text'>
+                  <AddRoundedIcon /> Add product
+                </Button>
+              </Link>
+              <RefreshIcon className='cursor-pointer' onClick={fetchData} />
+            </div>
+          </CardContent>
+        </Card>
       </Grid>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label='sticky table'>
