@@ -100,14 +100,14 @@ const LoginPage = () => {
     <Box className='content-center'>
       {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
-          <Alert severity='success' sx={{ '& a': { fontWeight: 400 } }}>
+          <Alert severity='success' variant='filled' sx={{ '& a': { fontWeight: 400 } }}>
             <span className='text-white'> {success}</span>
           </Alert>
         </Grid>
       )}
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
-          <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
+          <Alert severity='warning' variant='filled' sx={{ '& a': { fontWeight: 400 } }}>
              <span className='text-white'> {failed}</span>
           </Alert>
         </Grid>

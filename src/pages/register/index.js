@@ -149,15 +149,15 @@ const RegisterPage = () => {
     <Box className='content-center relative'>
       {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
-          <Alert severity='success' sx={{ '& a': { fontWeight: 400 } }}>
+          <Alert severity='success' variant='filled' sx={{ '& a': { fontWeight: 400 } }}>
             Account created successfully
           </Alert>
         </Grid>
       )}
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
-          <Alert severity='warning' sx={{ '& a': { fontWeight: 400 } }}>
-            An account with this email exist
+          <Alert severity='warning' variant='filled' sx={{ '& a': { fontWeight: 400 } }}>
+            {failed}
           </Alert>
         </Grid>
       )}
@@ -199,7 +199,7 @@ const RegisterPage = () => {
               type='text'
               fullWidth
               value={firstName}
-               placeholder='Jack'
+               placeholder='First Name'
               onChange={e => setFirstName(e.target.value)}
               id='firstName'
               label='First Name'
@@ -210,7 +210,7 @@ const RegisterPage = () => {
               type='text'
               fullWidth
               value={lastName}
-               placeholder='Doe'
+               placeholder='Last Name'
               onChange={e => setLastName(e.target.value)}
               id='lastName'
               label='Last Name'
@@ -221,7 +221,7 @@ const RegisterPage = () => {
               name='email'
               type='email'
               value={email}
-              placeholder='dave@example.com'
+              placeholder='email@example.com'
               onChange={e => setEmail(e.target.value)}
               label='Email'
               sx={{ marginBottom: 4 }}
@@ -231,7 +231,7 @@ const RegisterPage = () => {
               type='text'
               fullWidth
               value={storeName}
-              placeholder='royeshoesplug'
+              placeholder='mystore'
               onChange={e => setStoreName(e.target.value.toLowerCase().replace(/[^a-z]/g, ''))}
               id='storeName'
               label='Store Name'
