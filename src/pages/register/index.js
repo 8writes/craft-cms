@@ -120,7 +120,7 @@ const RegisterPage = () => {
             plan_amount: '0',
             plan_validity: 'Lifetime',
             product_count: '0',
-            storage: false,
+            storage: true,
             trial: false,
             store_orderId: `${storeName}Orders`,
           }
