@@ -411,7 +411,7 @@ const TableStickyHeader = () => {
                 <Typography variant='body1'>{`Phone Number: ${detailsDialogId?.phoneNumber || ''}`}</Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant='body1'>{`Cart: ${detailsDialogId?.orderInfo || ''}`}</Typography>
+                <Typography variant='body1'>{`Cart: ${detailsDialogId?.order_info || ''}`}</Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant='body1'>{`Address: ${detailsDialogId?.address || ''}`}</Typography>
