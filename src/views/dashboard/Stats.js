@@ -16,8 +16,8 @@ const TriangleImg = styled('img')({
 const Stats = () => {
   const userData = useUser()
 
-  const userFirstName = userData?.user_metadata?.first_name
-  const userStatus = userData?.user_metadata?.storage
+  const userFirstName = userData?.first_name
+  const userStatus = userData?.storage
 
   // ** Hook
   const theme = useTheme()

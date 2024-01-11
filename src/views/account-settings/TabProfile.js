@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid'
 import Link from '@mui/material/Link'
 import Alert from '@mui/material/Alert'
 import TextField from '@mui/material/TextField'
-import AlertTitle from '@mui/material/AlertTitle'
 import IconButton from '@mui/material/IconButton'
 import CardContent from '@mui/material/CardContent'
 import Skeleton from '@mui/material/Skeleton'
@@ -17,12 +16,6 @@ import Close from 'mdi-material-ui/Close'
 import { useState } from 'react'
 import { LoadingButton } from '@mui/lab'
 
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-const supabase = createClient(supabaseUrl, supabaseKey)
 
 const TabProfile = () => {
   const userData = useUser()
@@ -33,21 +26,22 @@ const TabProfile = () => {
   const skeleton = !userData
   const [isLoading, setLoading] = useState(false)
 
-  const userFirstName = userData?.user_metadata?.first_name
-  const userLastName = userData?.user_metadata?.last_name
-  const subscription = userData?.user_metadata?.subscription
+  const userFirstName = userData?.first_name
+  const userLastName = userData?.last_name
+  const subscription = userData?.subscription
   const createdAt = userData?.created_at
   const oldEmail = userData?.email
-  const changeEmail = userData?.email_change
 
   const handleEmailChange = event => {
     setNewEmail(event.target.value)
   }
 
+{/** 
+
   const handleUpdateEmail = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.auth.updateUser({ email: `${newEmail}` })
+      // add api call
       if (error) {
         setFailed(error.message)
       } else {
@@ -64,7 +58,8 @@ const TabProfile = () => {
       setSuccess('')
     }, 8000)
   }
-
+*/}
+  
   return (
     <CardContent>
       {success && (
@@ -128,7 +123,7 @@ const TabProfile = () => {
                   </LoadingButton>
                 </>
               ) : (
-                <LoadingButton type='button' sx={{ margin: '5px' }} size='small' onClick={() => setIsEditing(true)}>
+                <LoadingButton disabled type='button' sx={{ margin: '5px' }} size='small' onClick={() => setIsEditing(true)}>
                   Update Email
                 </LoadingButton>
               )}

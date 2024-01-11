@@ -1,11 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-const supabase = createClient(supabaseUrl, supabaseKey)
+import axios from 'axios'
 
 const UserContext = createContext(null)
 
@@ -14,49 +9,45 @@ export const useUser = () => {
   return useContext(UserContext)
 }
 
-// Provider component to wrap your app with
 export const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState(null)
   const router = useRouter()
 
-  // Subscribe to auth state changes
-  const authListener = supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
-      setUserData(session.user)
-    }
-  })
+      const fetchedUserData = async () => {
+      
+        try {
+          
+          const session = localStorage.getItem('auth-token')
 
-  useEffect(() => {
-    const session = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession()
-        if (error) {
-          console.log(error.message)
-        }
-        if (data.session === null) {
-          router.push('/login')
-          console.log(data)
-        }
-      } catch (error) {
-        console.log(error.message)
-      }
-    }
-    session()
-  }, []) // Add router to the dependency array
+          if (!session) {
+            if (router.pathname !== '/login' && router.pathname !== '/register') {
+              router.push('/login')
+            }
+          }
+          const sessionData = JSON.parse(session) 
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data } = await supabase.auth.getUser()
-        if (data) {
-          setUserData(data.user)
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error.message)
+          const userSessionData = sessionData || null
+          
+          const response = await axios.get(`https://craftserver.onrender.com/v1/api/fetchuser?id=${userSessionData.id}`)
+          
+          const { error, data } = response.data
+
+          if (error) {
+            setFailed(error.message)
+          }
+          
+            setUserData(data[0])
+  
+        } catch (error) {
+          console.log(error)
+        } 
       }
+  
+  useEffect(() => {
+    if (!userData) {
+      fetchedUserData()
     }
-    fetchUserData()
-  }, []) // Empty dependency array
+  }, [router.pathname])
 
   return <UserContext.Provider value={userData}>{children}</UserContext.Provider>
 }

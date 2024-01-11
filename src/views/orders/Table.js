@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 import Paper from '@mui/material/Paper'
 import Grid from '@mui/material/Grid'
 import Table from '@mui/material/Table'
@@ -19,24 +20,15 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Popover from '@mui/material/Popover'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import { styled, useTheme } from '@mui/material/styles'
 import SearchIcon from '@mui/icons-material/Search'
-import RefreshIcon from '@mui/icons-material/Refresh';
-
+import RefreshIcon from '@mui/icons-material/Refresh'
 import { useUser } from 'src/@core/context/userDataContext'
-
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-const supabase = createClient(supabaseUrl, supabaseKey)
 
 const columns = [
   { id: 'sn', label: 'S/N' },
-  { id: 'fullName', label: 'Name' },
+  { id: 'full_name', label: 'Name' },
   { id: 'reference', label: 'Reference ID' },
-  { id: 'orderDate', label: 'Date' },
+  { id: 'order_date', label: 'Date' },
   { id: 'price', label: 'Amount(₦)', format: value => value.toLocaleString('en-US') },
   { id: 'email', label: 'Email Address' },
   { id: 'status', label: 'Status' },
@@ -54,27 +46,14 @@ const TableStickyHeader = () => {
   const [normalData, setNormalData] = useState([])
   const [searchData, setSearchData] = useState([])
 
-  // ** Hook
-  const theme = useTheme()
-  const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
-
-  // Styled component for the triangle shaped background image
-  const TriangleImg = styled('img')({
-    right: 0,
-    bottom: 0,
-    height: 170,
-    position: 'absolute'
-  })
-
   // States for edit functionality
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [userId, setUserId] = useState('')
 
   const [editOrderStatus, setEditOrderStatus] = useState(0)
 
-  const [editProductId, setEditProductId] = useState(null)
-  const [deleteProductId, setDeleteProductId] = useState(null)
+  const [editOrderId, setEditOrderId] = useState(null)
+  const [deleteOrderId, setDeleteOrderId] = useState(null)
   const [detailsDialogId, setDetailsDialogId] = useState(null)
 
   // States for popover
@@ -83,41 +62,33 @@ const TableStickyHeader = () => {
   // Function to handle the opening of the popover
   const handlePopoverOpen = (event, id) => {
     setAnchorEl(event.currentTarget)
-    setDeleteProductId(id)
+    setDeleteOrderId(id)
   }
 
   // Function to handle the closing of the popover
   const handlePopoverClose = () => {
     setAnchorEl(null)
-    setDeleteProductId(null)
+    setDeleteOrderId(null)
   }
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data } = await supabase.auth.getUser()
-        const userId = data?.user?.id || ''
-        setUserId(userId)
-      } catch (e) {
-        console.error('Error getting user:', e)
-      }
-    }
+  const user_id = userData?.user_id
+  const store_order_id = userData?.store_order_id
 
-    if (userData?.user_metadata?.store_name) {
-      getUser()
+  useEffect(() => {
+    if (store_order_id) {
       fetchData()
     }
-  }, [userData?.user_metadata?.store_name])
-
-  const storeOrderId = userData?.user_metadata?.store_orderId
-
+   }, [store_order_id])
+  
   const fetchData = async () => {
     setSuspense(true)
     try {
-      const { data, error } = await supabase.from(`${storeOrderId}`).select()
+       const response = await axios.get(`https://craftserver.onrender.com/v1/api/fetch?store_order_id=${store_order_id}`)
+
+      const { error, data } = response.data
 
       if (error) {
-        throw error
+        setFailed(error.message)
       }
 
       // Reset the id counter
@@ -149,16 +120,20 @@ const TableStickyHeader = () => {
     setDeleteLoadingId(id)
 
     try {
-      const { error } = await supabase.from(`${storeOrderId}`).delete().eq('user_id', userId).eq('id', id)
+     const response = await axios.post(
+        `https://craftserver.onrender.com/v1/api/delete?store_order_id=${store_order_id}&id=${id}&user_id=${user_id}`
+      )
+
+      const { error } = response.data
 
       if (error) {
         setFailed(error.message)
       } else {
         setFailed('')
-        setSuccess('Product deleted successfully!')
+        setSuccess('Order deleted successfully!')
       }
-      setDeleteProductId(null)
-      setEditProductId(null)
+      setDeleteOrderId(null)
+      setEditOrderId(null)
       setAnchorEl(null)
     } catch (error) {
       setFailed('Network error')
@@ -179,27 +154,29 @@ const TableStickyHeader = () => {
   }
 
   const handleEdit = id => {
-    setEditProductId(id)
+    setEditOrderId(id)
   }
 
-  // Handle saving edited product
+  // Handle saving edited Order
   const handleSaveEdit = async () => {
     setIsLoading(true)
     try {
-      const { error } = await supabase
-        .from(`${storeOrderId}`)
-        .update({ status: editOrderStatus })
-        .eq('id', editProductId)
+      const response = await axios.post(
+        `https://craftserver.onrender.com/v1/api/update?store_order_id=${store_order_id}`,
+        { editOrderStatus, editOrderId }
+      )
+
+      const { error } = response.data
 
       if (error) {
         setFailed(error.message)
       } else {
-        setSuccess('Product updated successfully!')
+        setSuccess('Order updated successfully!')
       }
 
       await fetchData()
-      setDeleteProductId(null)
-      setEditProductId(null)
+      setDeleteOrderId(null)
+      setEditOrderId(null)
       setAnchorEl(null)
     } catch (error) {
       console.error('Error updating data:', error.message)
@@ -324,7 +301,7 @@ const TableStickyHeader = () => {
                       />
                       <Popover
                         id='edit-delete-popover'
-                        open={Boolean(anchorEl && deleteProductId === row.id)}
+                        open={Boolean(anchorEl && deleteOrderId === row.id)}
                         anchorEl={anchorEl}
                         onClose={handlePopoverClose}
                         anchorOrigin={{
@@ -360,9 +337,9 @@ const TableStickyHeader = () => {
       </TableContainer>
 
       {/* Edit Dialog */}
-      <Dialog open={Boolean(editProductId)} onClose={() => setEditProductId(null)}>
+      <Dialog open={Boolean(editOrderId)} onClose={() => setEditOrderId(null)}>
         <DialogTitle className='flex justify-between items-center'>
-          Update Order <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setEditProductId(null)} />
+          Update Order <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => setEditOrderId(null)} />
         </DialogTitle>
         <DialogContent className='grid gap-5'>
           <Grid item xs={12} sm={3}></Grid>
@@ -399,18 +376,18 @@ const TableStickyHeader = () => {
           {/* Render additional details from the selectedRow */}
           {detailsDialogId && (
             <Grid container spacing={2}>
-              <Grid item xs={12} sx={{display: 'flex', justifyContent: 'space-between'}}>
-                <Typography variant='body1'>{`Name: ${detailsDialogId?.fullName || ''}`}</Typography>
-                 <Typography variant='body1'>{`${detailsDialogId?.orderDate || ''}`}</Typography>
+              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant='body1'>{`Name: ${detailsDialogId?.full_name || ''}`}</Typography>
+                <Typography variant='body1'>{`${detailsDialogId?.order_date || ''}`}</Typography>
               </Grid>
-               <Grid item xs={12}>
+              <Grid item xs={12}>
                 <Typography variant='body1'>{`Email Address: ${detailsDialogId?.email || ''}`}</Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant='body1'>{`Reference ID: ${detailsDialogId?.reference || ''}`}</Typography>
               </Grid>
-             <Grid item xs={12}>
-                <Typography variant='body1'>{`Phone Number: ${detailsDialogId?.phoneNumber || ''}`}</Typography>
+              <Grid item xs={12}>
+                <Typography variant='body1'>{`Phone Number: ${detailsDialogId?.phone_number || ''}`}</Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant='body1'>{`Cart: ${detailsDialogId?.order_info || ''}`}</Typography>
@@ -422,7 +399,7 @@ const TableStickyHeader = () => {
                 <Typography variant='body1'>{`Note: ${detailsDialogId?.note || ''}`}</Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant='body1'>{`Total Amount: ₦${
+                <Typography variant='body1'>{`Total Amount: ${
                   detailsDialogId?.price?.toLocaleString('en-US') || ''
                 }`}</Typography>
               </Grid>

@@ -1,30 +1,19 @@
 // ** React Imports
 import { useState, Fragment } from 'react'
-
-// ** Next Import
 import { useRouter } from 'next/router'
-
-// ** Import Supabase client
-import { createClient } from '@supabase/supabase-js'
-
-// ** Connect supabase
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-
-// ** MUI Imports
+import { styled } from '@mui/material/styles'
+import { useUser } from 'src/@core/context/userDataContext'
+import axios from 'axios'
 import Box from '@mui/material/Box'
 import Menu from '@mui/material/Menu'
 import Badge from '@mui/material/Badge'
 import Avatar from '@mui/material/Avatar'
 import Divider from '@mui/material/Divider'
 import MenuItem from '@mui/material/MenuItem'
-import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
-
-// ** Icons Imports
 import CogOutline from 'mdi-material-ui/CogOutline'
 import LogoutVariant from 'mdi-material-ui/LogoutVariant'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
-import { useUser } from 'src/@core/context/userDataContext'
 
 // ** Styled Components
 const BadgeContentSpan = styled('span')(({ theme }) => ({
@@ -47,7 +36,7 @@ const UserDropdown = () => {
     setAnchorEl(event.currentTarget)
   }
 
-  const handleDropdownClose = (url) => {
+  const handleDropdownClose = url => {
     if (url) {
       router.push(url)
     }
@@ -68,25 +57,37 @@ const UserDropdown = () => {
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut()
-      if (error) {
-        throw error
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error.message)
-    } finally {
-      router.push('/login')
+const handleLogout = async () => {
+  try {
+
+    const response = await axios.post('https://craftserver.onrender.com/v1/api/signout');
+
+    const { error } = response.data;
+
+    if (error) {
+      throw new Error('Error logging out');
+    } else if (response.status === 200) {
+      
+      // Remove session from local storage
+      localStorage.removeItem('auth-token');
+
+      // Redirect to the login page
+    await router.push('/login');
     }
+  } catch (error) {
+    console.error('Error during logout:', error.message);
+  } finally { 
+    // Trigger screen refresh
+     window.location.reload(true)
   }
+};
 
-  
-  const userFirstName = userData?.user_metadata?.first_name
-  const userLastName = userData?.user_metadata?.last_name
 
-  const firstLetterOfLastName = userLastName ? userLastName.slice(0, 1) : '';
-  
+  const userFirstName = userData?.first_name
+  const userLastName =  userData?.last_name
+
+  const firstLetterOfLastName = userLastName ? userLastName.slice(0, 1) : ''
+
   return (
     <Fragment>
       <Badge
@@ -121,7 +122,9 @@ const UserDropdown = () => {
               <Avatar alt='John Doe' src='/images/avatars/1.png' sx={{ width: '2.5rem', height: '2.5rem' }} />
             </Badge>
             <Box sx={{ display: 'flex', marginLeft: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
-              <Typography sx={{ fontWeight: 600 }}>{userFirstName} .{firstLetterOfLastName}</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                {userFirstName} .{firstLetterOfLastName}
+              </Typography>
             </Box>
           </Box>
         </Box>
@@ -142,10 +145,10 @@ const UserDropdown = () => {
         <Divider />
 
         <MenuItem sx={{ py: 2 }} onClick={handleLogout}>
-            <span>
-              <LogoutVariant sx={{ marginRight: 2, fontSize: '1.375rem', color: 'text.secondary' }} />
-              Logout
-            </span>
+          <span>
+            <LogoutVariant sx={{ marginRight: 2, fontSize: '1.375rem', color: 'text.secondary' }} />
+            Logout
+          </span>
         </MenuItem>
       </Menu>
     </Fragment>

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
+import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
+import axios from 'axios'
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
@@ -17,19 +17,12 @@ import Select from '@mui/material/Select'
 import { styled, useTheme } from '@mui/material/styles'
 import LoadingButton from '@mui/lab/LoadingButton'
 import Alert from '@mui/material/Alert'
-import AlertTitle from '@mui/material/AlertTitle'
 import { useUser } from 'src/@core/context/userDataContext'
 import Link from 'next/link'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-const supabase = createClient(supabaseUrl, supabaseKey)
+import FormData from 'form-data'
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
@@ -37,6 +30,9 @@ const ButtonStyled = styled(Button)(({ theme }) => ({
     textAlign: 'center'
   }
 }))
+
+
+const url = process.env.URL
 
 const FormLayoutsSeparator = () => {
   const userData = useUser()
@@ -53,7 +49,6 @@ const FormLayoutsSeparator = () => {
   const [isLoading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
   const [failed, setFailed] = useState('')
-  const [userId, setUserId] = useState('')
   const [formDisabled, setFormDisabled] = useState(false)
   const [productSizes, setProductSizes] = useState([])
   const [productCount, setProductCount] = useState(0)
@@ -89,23 +84,11 @@ const FormLayoutsSeparator = () => {
     }
   }
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data } = await supabase.auth.getUser()
-        const userId = data?.user?.id || ''
-
-        setUserId(userId)
-      } catch (e) {
-        console.error('Error getting user:', e)
-      }
-    }
-    getUser()
-  })
-
-  const emailAddress = userData?.email
-  const storeName = userData?.user_metadata?.store_name
-  const subscription = userData?.user_metadata?.subscription
+  const user_id = userData?.id
+  const email = userData?.email
+  const store_name_id = userData?.store_name_id
+  const store_bucket_id = userData?.store_bucket_id
+  const subscription = userData?.subscription
 
   const uploadImage = async index => {
     try {
@@ -115,19 +98,26 @@ const FormLayoutsSeparator = () => {
         return null
       }
 
-      const { data, error } = await supabase.storage.from(storeName).upload(`${userId}/public/${uuidv4()}`, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await axios.post(
+        `https://craftserver.onrender.com/v1/api/uploadfile?id=${user_id}&store_bucket_id=${store_bucket_id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+
+      const { error, url } = response.data
 
       if (error) {
         setFailed(error.message)
-        console.error(error)
 
         return null
       }
-
-      const url = data.fullPath
 
       return url
     } catch (error) {
@@ -149,34 +139,35 @@ const FormLayoutsSeparator = () => {
       const ImgUrls = await Promise.all(selectedImages.map((_, index) => uploadImage(index)))
 
       // Prepare an array to store individual data objects
-      const formDataArray = [
-        {
-          user_id: userId,
-          created_at: new Date().toISOString(),
-          name: productName,
-          description: productDescription,
-          price: sellingPrice,
-          size: sizes,
-          tag: productTag,
-          email: emailAddress,
-          stock: productStock,
-          date: date,
-          uploadedImageUrls: ImgUrls
-        }
-      ]
+      const formData = {
+        user_id,
+        name: productName,
+        description: productDescription,
+        price: sellingPrice,
+        size: sizes,
+        tag: productTag,
+        email,
+        stock: productStock,
+        date,
+        uploaded_image_urls: ImgUrls
+      }
 
-      // Perform data insertion into Supabase
-      const { data, error } = await supabase.from(`${storeName}`).insert(formDataArray)
+      const response = await axios.post(`https://craftserver.onrender.com/v1/api/insert?store_name_id=${store_name_id}`, {
+        formData,
+      })
 
-      // Handle success or error
+      const { error } = response.data
+
       if (error) {
         setFailed(error.message)
-        
-        return
+
+        return null
       } else {
         setFailed('')
         setSuccess('Product Uploaded successfully!')
+
          clearForm();
+        window.location.reload(true)
       }
     } catch (error) {
       setFailed(error.message)
@@ -184,46 +175,50 @@ const FormLayoutsSeparator = () => {
     }
   }
 
+  useEffect(() => {
+    if (store_name_id) {
+      handleDataCount()
+    }
+  }, [store_name_id])
+  
   // Function to fetch product count
   const handleDataCount = async () => {
     try {
-      const { data, error } = await supabase.from(`${storeName}`).select()
+      const response = await axios.get(`https://craftserver.onrender.com/v1/api/fetch?store_name_id=${store_name_id}`)
+
+      const { error, data } = response.data
 
       if (error) {
+        setFailed(error.message)
+
+        return null
       } else {
-        // Check for product data and calculate product count
+
         const dataCount = data ? data.length : 0
 
         setProductCount(dataCount)
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  // Fetch product count on component mount
-  useEffect(() => {
-    handleDataCount()
-  }, [storeName]) // Trigger the effect when storeName changes
 
   // Function to handle the overall upload process
   const handleUpload = async () => {
     setLoading(true)
     setFormDisabled(true)
+   
+   await handleDataCount()
 
     try {
-      // Fetch user information including max_product
-      const { data, error } = await supabase.auth.getUser()
-
-      if (error) {
-        setFailed(error.message)
-      }
-
       let subscriptionLimit
       switch (subscription) {
         case 'Free':
           subscriptionLimit = 0
           break
         case 'Trial':
-          subscriptionLimit = 5
+          subscriptionLimit = 4
           break
         case 'Basic':
           subscriptionLimit = 50
@@ -232,7 +227,7 @@ const FormLayoutsSeparator = () => {
           subscriptionLimit = 100
           break
         default:
-          subscriptionLimit = 0 // Default to free subscription
+          subscriptionLimit = 0
           break
       }
 
@@ -242,24 +237,22 @@ const FormLayoutsSeparator = () => {
 
         return
       } else {
+        await uploadImage()
         await handleUploadForm()
-        handleDataCount()
       }
-    
     } catch (error) {
-      console.error('An unexpected error occurred:', error.message)
-      
+      setFailed(error.message)
     } finally {
-    // Reset success and failure after a delay
-    setTimeout(() => {
-      setSuccess('');
-      setFailed('');
-    }, 8000);
+      // Reset success and failure after a delay
+      setTimeout(() => {
+        setSuccess('')
+        setFailed('')
+      }, 8000)
 
-    setFormDisabled(false);
-    setLoading(false);
+      setFormDisabled(false)
+      setLoading(false)
+    }
   }
-}
 
   // Function to clear form fields
   const clearForm = () => {
@@ -364,7 +357,7 @@ const FormLayoutsSeparator = () => {
                   ))}
                 <Box>
                   <ButtonStyled variant='text' onClick={handleAddMoreImages} disabled={formDisabled}>
-                    <AddRoundedIcon sx={{ width: '50px', height: '50px' }} />
+                    <AddRoundedIcon sx={{ width: '50px', height: '50px' }} disabled={formDisabled} />
                     Add Image
                   </ButtonStyled>
                   <input
@@ -483,7 +476,7 @@ const FormLayoutsSeparator = () => {
                     disabled={formDisabled}
                     onChange={e => handleSizeChange(index, e.target.value)}
                   />
-                  <CloseRoundedIcon className='cursor-pointer mx-2' onClick={() => handleRemoveSize(index)} />
+                  <CloseRoundedIcon disabled={formDisabled} className='cursor-pointer mx-2' onClick={() => handleRemoveSize(index)} />
                 </div>
               ))}
               <div className='flex items-center my-2'>

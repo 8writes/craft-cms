@@ -15,23 +15,17 @@ import {
 } from '@mui/material'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 
-import { createClient } from '@supabase/supabase-js'
 import { useUser } from 'src/@core/context/userDataContext'
 import Link from 'next/link'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-const supabase = createClient(supabaseUrl, supabaseKey)
 
 const TabSubscription = () => {
   const userData = useUser()
   const [isPopupOpen, setIsPopupOpen] = useState(false)
 
-  const subscriptionValidity = userData?.user_metadata?.plan_validity
-  const storeSubscription = userData?.user_metadata?.subscription
-  const subscriptionAmount = userData?.user_metadata?.plan_amount
-  const  productCount = userData?.user_metadata?.product_count
+  const subscriptionValidity = userData?.plan_validity
+  const storeSubscription = userData?.subscription
+  const subscriptionAmount = userData?.plan_amount
+  const  productCount = userData?.product_count
 
   // Paystack configuration
   const paystackPublicKey = 'pk_test_990b84e62bcd13690d07272f933a2080b195ce10' // Replace with your Paystack public key

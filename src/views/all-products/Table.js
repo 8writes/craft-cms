@@ -1,7 +1,5 @@
 // ** React Imports
-import React, { useState, useEffect } from 'react'
-
-// ** MUI Imports
+import React, { useEffect, useState } from 'react'
 import Paper from '@mui/material/Paper'
 import Grid from '@mui/material/Grid'
 import Table from '@mui/material/Table'
@@ -13,7 +11,6 @@ import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
 import {
   Alert,
-  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -31,22 +28,13 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
-import MoreVertIcon from '@mui/icons-material/MoreVert' // <-- Import MoreVertIcon
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Popover from '@mui/material/Popover'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import RefreshIcon from '@mui/icons-material/Refresh'
-
-import { useUser } from 'src/@core/context/userDataContext'
-
-import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-const supabase = createClient(supabaseUrl, supabaseKey)
-
-let idCounter = 0
+import { useUser } from 'src/@core/context/userDataContext'
+import axios from 'axios'
 
 // Define table columns
 const columns = [
@@ -72,7 +60,6 @@ const TableStickyHeader = () => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [tableData, setTableData] = useState([])
-  const [userId, setUserId] = useState('')
   const [editProductId, setEditProductId] = useState(null)
   const [editPrice, setEditPrice] = useState(0)
   const [editStock, setEditStock] = useState(0)
@@ -94,38 +81,29 @@ const TableStickyHeader = () => {
     setDeleteProductId(null)
   }
 
-  // Fetch user data on component mount
+  // Store user metadata and product data
+  const user_id = userData?.id
+  const store_name_id = userData?.store_name_id
+  const store_bucket_id = userData?.store_bucket_id
+
+  // Fetch product 
+
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data } = await supabase.auth.getUser()
-        const userId = data?.user?.id || ''
-        setUserId(userId)
-      } catch (e) {
-        console.error('Error getting user:', e)
-      }
-    }
-
-    getUser()
-    const storeName = userData?.user_metadata?.store_name
-
-    if (storeName) {
+    if (store_name_id) {
       fetchData()
     }
-  }, [userData?.user_metadata?.store_name])
+  }, [store_name_id])
 
-  // Store user metadata and product data
-  const storeName = userData?.user_metadata?.store_name
-
-  // Fetch product data from Supabase
   const fetchData = async () => {
     setSuspense(true)
 
     try {
-      const { data, error } = await supabase.from(`${storeName}`).select()
+      const response = await axios.get(`https://craftserver.onrender.com/v1/api/fetch?store_name_id=${store_name_id}`)
+
+      const { error, data } = response.data
 
       if (error) {
-        throw error
+        setFailed(error.message)
       }
 
       // Reset the id counter
@@ -135,7 +113,7 @@ const TableStickyHeader = () => {
       const formattedData = data.map(item => ({
         ...item,
         sn: ++idCounter,
-        image: item.uploadedImageUrls // Assuming uploadedImageUrls is an array of image URLs
+        image: item.uploaded_image_urls // Assuming uploaded_image_urls is an array of image URLs
       }))
 
       setImageUrl(formattedData.map(item => item.image))
@@ -154,7 +132,11 @@ const TableStickyHeader = () => {
       const productToDelete = tableData.find(product => product.id === id)
       await deleteImage(productToDelete.image) // Pass the image URLs to deleteImage function
 
-      const { error } = await supabase.from(`${storeName}`).delete().eq('user_id', userId).eq('id', id)
+      const response = await axios.post(
+        `https://craftserver.onrender.com/v1/api/delete?store_name_id=${store_name_id}&id=${id}&user_id=${user_id}`
+      )
+
+      const { error } = response.data
 
       if (error) {
         setFailed(error.message)
@@ -180,18 +162,14 @@ const TableStickyHeader = () => {
 
   const deleteImage = async imageUrls => {
     try {
-      // Modify the URLs to remove the dynamic part before the first "/"
-      const modifiedUrls = imageUrls.map(url => {
-        const firstSlashIndex = url.indexOf('/')
+      const response = await axios.post(
+        `https://craftserver.onrender.com/v1/api/remove?store_bucket_id=${store_bucket_id}&modified_urls=${imageUrls}`
+      )
 
-        return firstSlashIndex !== -1 ? url.slice(firstSlashIndex + 1) : url
-      })
-
-      // Call the remove method with the array of objects
-      const { data, error } = await supabase.storage.from(storeName).remove(modifiedUrls)
+      const { error } = response.data
 
       if (error) {
-        console.log('send error to support:', error.message)
+        setFailed(error.message)
       }
     } catch (error) {
       console.error('Error deleting images:', error.message)
@@ -209,11 +187,14 @@ const TableStickyHeader = () => {
   const handleSaveEdit = async () => {
     setIsLoading(true)
     try {
-      const { error } = await supabase
-        .from(`${storeName}`)
-        .update({ price: editPrice, stock: editStock })
-        .eq('user_id', userId)
-        .eq('id', editProductId)
+      
+
+      const response = await axios.post(
+        `https://craftserver.onrender.com/v1/api/update?store_name_id=${store_name_id}&user_id=${user_id}`,
+        { editPrice, editStock, editProductId }
+      )
+
+       const { error } = response.data
 
       if (error) {
         setFailed(error.message)
@@ -279,7 +260,6 @@ const TableStickyHeader = () => {
           >
             <Typography variant='h5'>Products</Typography>
             <div className='flex gap-2 items-center'>
-              
               <Link href='/add-new-product' passHref>
                 <Button size='medium' variant='text'>
                   <AddRoundedIcon /> Add product
@@ -306,9 +286,11 @@ const TableStickyHeader = () => {
             <TableBody>
               <TableRow>
                 {columns.map(column => (
-                  <TableCell key={column.id}>
-                    <Skeleton animation='wave' />
-                  </TableCell>
+                  <>
+                    <TableCell key={column.id}>
+                      <Skeleton animation='wave' />
+                    </TableCell>
+                  </>
                 ))}
                 <TableCell>
                   <Skeleton animation='wave' />
@@ -322,9 +304,9 @@ const TableStickyHeader = () => {
                   <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
                     {columns.map(column => (
                       <TableCell key={column.id} align={column.align}>
-                        {column.id === 'image' ? (
+                        {column.id === 'image' && row.image ? (
                           <img
-                            src={`https://hymcbwrcksuwhtfstztz.supabase.co/storage/v1/object/public/${row.image[0]}`}
+                            src={`${row.image[0]}`}
                             alt={`Product ${row.sn} Image`}
                             style={{ width: '60px', height: '50px', borderRadius: '5px' }}
                           />

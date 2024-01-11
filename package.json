@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "author": {
     "name": "Syncstore",
-    "url": "https://storex.com"
+    "url": "https://craft.com"
   },
   "bugs": {
     "url": "https://github.com/themeselection/materio-mui-react-nextjs-admin-template-free/issues"
@@ -38,11 +38,12 @@
     "@mui/lab": "^5.0.0-alpha.70",
     "@mui/material": "^5.14.20",
     "@popperjs/core": "^2.11.2",
-    "@supabase/supabase-js": "^2.39.0",
     "apexcharts-clevision": "3.28.5",
+    "axios": "^1.6.3",
     "babel-eslint": "^10.1.0",
     "clsx": "^1.1.1",
     "dotenv": "^16.3.1",
+    "form-data": "^4.0.0",
     "js-cookie": "^3.0.5",
     "mdi-material-ui": "^7.1.0",
     "next": "12.0.4",

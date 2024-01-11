@@ -2,36 +2,43 @@
 import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
+import { LoadingButton } from '@mui/lab'
+import { useState } from 'react'
 import { useUser } from 'src/@core/context/userDataContext'
-import { Alert, AlertTitle, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, Grid } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControl,
+  Grid
+} from '@mui/material'
 import Link from 'next/link'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import { useEffect, useState } from 'react'
 import Skeleton from '@mui/material/Skeleton'
-import { LoadingButton } from '@mui/lab'
-
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-const supabase = createClient(supabaseUrl, supabaseKey)
+import axios from 'axios'
 
 const Trial = () => {
   const userData = useUser()
   const [isLoading, setLoading] = useState(false)
 
-   const [success, setSuccess] = useState('')
+  const [success, setSuccess] = useState('')
   const [failed, setFailed] = useState('')
 
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [isPopupTrialOpen, setIsPopupTrialOpen] = useState(false)
 
-  const subscriptionValidity = userData?.user_metadata?.plan_validity
-  const storeSubscription = userData?.user_metadata?.subscription
-  const subscriptionAmount = userData?.user_metadata?.plan_amount
-  const productCount = userData?.user_metadata?.product_count
-  const trial = userData?.user_metadata?.trial
+  const id = userData?.id
+  const store_name_id = userData?.store_name_id
+  const plan_validity = userData?.plan_validity
+  const subscription = userData?.subscription
+  const plan_amount = userData?.plan_amount
+  const product_count = userData?.product_count
+  const trial = userData?.trial
 
   const handleUpgradeSubscription = () => {
     // Open the popup
@@ -49,71 +56,58 @@ const Trial = () => {
     setIsPopupTrialOpen(true)
   }
 
-  useEffect(() => {
-    const validateTrial = async () => {
-      try {
-        // Calculate the date one month from now
-        const currentDate = new Date()
-        const oneMonthLater = new Date(currentDate)
-        oneMonthLater.setMonth(currentDate.getMonth() + 1)
-
-        const { data, error } = await supabase.auth.user()
-
-        if (error) {
-          console.error(error)
-
-          return
-        }
-
-        const planValidityDate = oneMonthLater.toISOString().substring(0, 10)
-
-        // Check if the current date is equal to or exceeds the plan_validity date
-        if (currentDate >= planValidityDate) {
-          const { data, error } = await supabase.auth.updateUser({
-            data: {
-              plan_validity: 'Expired',
-              product_count: '0'
-            }
-          })
-        }
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    validateTrial() // Call the function when the component mounts
-  }, [])
-
-  const handleFreeTrialUpload = async () => {
+  const handleFreeTrialUpdate = async () => {
     try {
       setLoading(true)
 
+          // Retrieve the stored session data from localStorage
+      const session = localStorage.getItem('auth-token');
+
+      // Check if the session data is a valid JSON string
+      if (!session) {
+        throw new Error('Invalid session data in localStorage');
+      }
+
+      const sessionData = JSON.parse(session);
+
+      const userSessionData = sessionData || null;
+
       // Calculate the date one month from now
-      const currentDate = new Date()
-      const oneMonthLater = new Date(currentDate)
-      oneMonthLater.setMonth(currentDate.getMonth() + 1)
+      const currentDate = new Date();
+      const oneMonthLater = new Date(currentDate);
+      oneMonthLater.setMonth(currentDate.getMonth() + 1);
 
       // Extract only the date part in the format "YYYY-MM-DD"
-      const planValidityDate = oneMonthLater.toISOString().substring(0, 10)
+      const planValidity = oneMonthLater.toISOString().substring(0, 10);
 
-      const { data, error } = await supabase.auth.updateUser({
-        data: {
-          subscription: 'Trial',
-          trial: true,
-          plan_validity: planValidityDate,
-          product_count: '5'
-        }
-      })
+      const response = await axios.post(`https://craftserver.onrender.com/v1/api/updateuser?id=${userSessionData.id}`, {
+        store_name_id,
+        subscription: 'Trial',
+        trial: true,
+        plan_validity: planValidity,
+        product_count: '4'
+      });
+
+      const { error } = response.data;
+
       if (error) {
-        setFailed(error.message)
+        setFailed(error.message);
       } else {
-        setSuccess('Free trial successfully activated!')
+        setSuccess('Free trial successfully activated!');
       }
     } catch (error) {
+
+      console.log('An unexpected error ocurred:', error.message)
     } finally {
       setLoading(false)
 
-        setTimeout(() => {
+      setIsPopupOpen(false)
+      setIsPopupTrialOpen(false)
+
+      // Trigger screen refresh
+      window.location.reload(true)
+
+      setTimeout(() => {
         setSuccess('')
       }, 8000)
     }
@@ -132,7 +126,7 @@ const Trial = () => {
 
   return (
     <Card sx={{ position: 'relative' }}>
-       {success && (
+      {success && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, right: 0, zIndex: 55 }}>
           <Alert variant='filled' severity='success' sx={{ '& a': { fontWeight: 500 } }}>
             <span className='text-white'> {success}</span>
@@ -152,13 +146,13 @@ const Trial = () => {
           Your Current Plan
         </Typography>
         <Typography variant='h6' gutterBottom>
-          Subscription: {storeSubscription}
+          Subscription: {subscription}
         </Typography>
         <Typography variant='body1' gutterBottom>
-          Amount: ₦{subscriptionAmount} (NGN)
+          Amount: ₦{plan_amount} (NGN)
         </Typography>
         <Typography variant='body1' gutterBottom>
-          Expires: {subscriptionValidity}
+          Expires: {plan_validity}
         </Typography>
         <Divider />
         <Typography
@@ -166,7 +160,7 @@ const Trial = () => {
           variant='body1'
           gutterBottom
         >
-          Max Products: {productCount}
+          Max Products: {product_count}
         </Typography>
 
         <Box className='mt-5 flex justify-end gap-2'>
@@ -210,7 +204,7 @@ const Trial = () => {
               </Typography>
               <Divider />
               <Typography variant='body1' gutterBottom>
-                Max Products: 5
+                Max Products: 4
               </Typography>
             </FormControl>
           </DialogContent>
@@ -221,7 +215,7 @@ const Trial = () => {
               size='large'
               disabled={trial}
               loading={Boolean(isLoading)}
-              onClick={handleFreeTrialUpload}
+              onClick={handleFreeTrialUpdate}
               className=' text-white font-bold py-2 px-4 rounded'
             >
               Upgrade Plan

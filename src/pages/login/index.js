@@ -1,14 +1,9 @@
 // ** React Imports
 import { useState } from 'react'
-
-// ** Import Supabase client
-import { createClient } from '@supabase/supabase-js'
-
-// ** Next Imports
-import Link from 'next/link'
-
-// ** MUI Components
+import { styled } from '@mui/material/styles'
 import { useRouter } from 'next/router'
+import axios from 'axios'
+import Link from 'next/link'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import InputLabel from '@mui/material/InputLabel'
@@ -17,26 +12,15 @@ import IconButton from '@mui/material/IconButton'
 import CardContent from '@mui/material/CardContent'
 import FormControl from '@mui/material/FormControl'
 import OutlinedInput from '@mui/material/OutlinedInput'
-import { styled, useTheme } from '@mui/material/styles'
 import MuiCard from '@mui/material/Card'
 import InputAdornment from '@mui/material/InputAdornment'
 import LoadingButton from '@mui/lab/LoadingButton'
 import Grid from '@mui/material/Grid'
 import Alert from '@mui/material/Alert'
-import AlertTitle from '@mui/material/AlertTitle'
-
-// ** Icons Imports
 import EyeOutline from 'mdi-material-ui/EyeOutline'
 import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
-
-// ** Configs
 import themeConfig from 'src/configs/themeConfig'
-
-// ** Layout Import
 import BlankLayout from 'src/@core/layouts/BlankLayout'
-
-// ** Connect supabase
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
 // ** Styled Components
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -68,31 +52,35 @@ const LoginPage = () => {
     event.preventDefault()
   }
 
-  // ** API call
   const handleLogin = async () => {
     setLoading(true)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const response = await axios.post('https://craftserver.onrender.com/v1/api/login', {
         email: email,
         password: password
       })
 
+      const { error, session } = response.data
+
       if (error) {
-        // Handle login error
         setFailed(error.message)
       } else {
         setFailed('')
-        setSuccess('Login successful!')
+        setSuccess('Account login successfully!')
+
+        // Store session
+        localStorage.setItem('auth-token', JSON.stringify(session))
+
         setTimeout(() => {
           router.push('/dashboard')
-        }, 1000)
+        }, 400)
       }
     } catch (error) {
-      console.error('Unexpected error during login:', error.message)
-      setFailed('An error occurred during login')
+      setFailed('Invalid login credentials')
     } finally {
       setLoading(false)
+      
     }
   }
 
@@ -108,7 +96,7 @@ const LoginPage = () => {
       {failed && (
         <Grid item xs={7} sx={{ m: 3, position: 'fixed', top: 0, zIndex: 55 }}>
           <Alert severity='warning' variant='filled' sx={{ '& a': { fontWeight: 400 } }}>
-             <span className='text-white'> {failed}</span>
+            <span className='text-white'> {failed}</span>
           </Alert>
         </Grid>
       )}
@@ -190,7 +178,7 @@ const LoginPage = () => {
               disabled={isDisabled}
               sx={{ marginBottom: 7 }}
               onClick={handleLogin}
-               autoFocus
+              autoFocus
             >
               Login
             </LoadingButton>

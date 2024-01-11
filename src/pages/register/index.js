@@ -1,14 +1,9 @@
-// ** React Imports
+// ** Imports
 import { useState, Fragment } from 'react'
 import { useRouter } from 'next/router'
-
-// ** Import Supabase client
-import { createClient } from '@supabase/supabase-js'
-
-// ** Next Imports
+import { styled } from '@mui/material/styles'
+import axios from 'axios'
 import Link from 'next/link'
-
-// ** MUI Components
 import Box from '@mui/material/Box'
 import Checkbox from '@mui/material/Checkbox'
 import TextField from '@mui/material/TextField'
@@ -18,28 +13,16 @@ import IconButton from '@mui/material/IconButton'
 import CardContent from '@mui/material/CardContent'
 import FormControl from '@mui/material/FormControl'
 import OutlinedInput from '@mui/material/OutlinedInput'
-import { styled, useTheme } from '@mui/material/styles'
 import MuiCard from '@mui/material/Card'
 import InputAdornment from '@mui/material/InputAdornment'
 import MuiFormControlLabel from '@mui/material/FormControlLabel'
 import LoadingButton from '@mui/lab/LoadingButton'
 import Grid from '@mui/material/Grid'
 import Alert from '@mui/material/Alert'
-import AlertTitle from '@mui/material/AlertTitle'
-
-// ** Icons
 import EyeOutline from 'mdi-material-ui/EyeOutline'
 import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
-
-// ** Configs
 import themeConfig from 'src/configs/themeConfig'
-
-// ** Connect supabase
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-
-// ** Layout Import
 import BlankLayout from 'src/@core/layouts/BlankLayout'
-import { useUser } from 'src/@core/context/userDataContext'
 
 // ** Styled Components
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -77,13 +60,11 @@ const RegisterPage = () => {
   const [checkbox, setCheckbox] = useState(false)
   const [passwordError, setPasswordError] = useState('')
 
-  const isDisabled = !email || !password || !firstName || !lastName || !checkbox || !storeName || !!passwordError;
+  const isDisabled = !email || !password || !firstName || !lastName || !checkbox || !storeName || !!passwordError
 
   const handleCheckboxChange = e => {
     setCheckbox(e.target.checked)
   }
-
-  // ** Hook
 
   const handleClickShowPassword = () => setShowPassword(show => !show)
 
@@ -104,47 +85,37 @@ const RegisterPage = () => {
     }
   }
 
-  // ** API call
   const handleSignup = async () => {
     setLoading(true)
+
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            store_name: storeName,
-            subscription: 'Free',
-            plan_amount: '0',
-            plan_validity: 'Lifetime',
-            product_count: '0',
-            storage: true,
-            trial: false,
-            store_orderId: `${storeName}Orders`,
-          }
-        }
+      const response = await axios.post('https://craftserver.onrender.com/v1/api/signup', {
+        email,
+        password,
+        firstName,
+        lastName,
+        storeName
       })
-    
+
+      const { error } = response.data
+
       if (error) {
-        // Handle login error
         setFailed(error.message)
-      } else {
-        // Handle login success
+      } else if (response.status === 200) {
         setSuccess('Account created successfully!')
-    setFailed('')
-         setTimeout(() => {
+        setFailed('')
+        setTimeout(() => {
           router.push('/login')
-        }, 1500)
+        }, 1000)
       }
     } catch (error) {
-      console.error('Unexpected error during login:', error.message)
+      // console.error('Unexpected error during signUp:', error.message);
+      setFailed(error.message)
     } finally {
       setLoading(false)
     }
   }
-  
+
   return (
     <Box className='content-center relative'>
       {success && (
@@ -199,7 +170,7 @@ const RegisterPage = () => {
               type='text'
               fullWidth
               value={firstName}
-               placeholder='First Name'
+              placeholder='First Name'
               onChange={e => setFirstName(e.target.value)}
               id='firstName'
               label='First Name'
@@ -210,7 +181,7 @@ const RegisterPage = () => {
               type='text'
               fullWidth
               value={lastName}
-               placeholder='Last Name'
+              placeholder='Last Name'
               onChange={e => setLastName(e.target.value)}
               id='lastName'
               label='Last Name'
@@ -226,7 +197,7 @@ const RegisterPage = () => {
               label='Email'
               sx={{ marginBottom: 4 }}
             />
-             <TextField
+            <TextField
               name='storeName'
               type='text'
               fullWidth
