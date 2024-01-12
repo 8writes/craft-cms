@@ -261,6 +261,7 @@ const FormLayoutsSeparator = () => {
     setProductTag('')
     setSellingPrice('')
     setProductStock('')
+    setSizes([])
     setProductSizes([])
     setSelectedImages([])
   }
