@@ -63,6 +63,8 @@ const TableStickyHeader = () => {
   const [editProductId, setEditProductId] = useState(null)
   const [editPrice, setEditPrice] = useState(0)
   const [editStock, setEditStock] = useState(0)
+  const [editName, setEditName] = useState(0)
+  const [editSize, setEditSize] = useState([])
   const [imageUrls, setImageUrl] = useState([])
 
   // States for popover
@@ -86,7 +88,7 @@ const TableStickyHeader = () => {
   const store_name_id = userData?.store_name_id
   const store_bucket_id = userData?.store_bucket_id
 
-  // Fetch product 
+  // Fetch product
 
   useEffect(() => {
     if (store_name_id) {
@@ -98,7 +100,7 @@ const TableStickyHeader = () => {
     setSuspense(true)
 
     try {
-      const response = await axios.get(`https://craftserver.onrender.com/v1/api/fetch?store_name_id=${store_name_id}`)
+      const response = await axios.get(` https://craftserver.onrender.com/v1/api/fetch?store_name_id=${store_name_id}`)
 
       const { error, data } = response.data
 
@@ -133,7 +135,7 @@ const TableStickyHeader = () => {
       await deleteImage(productToDelete.image) // Pass the image URLs to deleteImage function
 
       const response = await axios.post(
-        `https://craftserver.onrender.com/v1/api/delete?store_name_id=${store_name_id}&id=${id}&user_id=${user_id}`
+        ` https://craftserver.onrender.com/v1/api/delete?store_name_id=${store_name_id}&id=${id}&user_id=${user_id}`
       )
 
       const { error } = response.data
@@ -163,7 +165,7 @@ const TableStickyHeader = () => {
   const deleteImage = async imageUrls => {
     try {
       const response = await axios.post(
-        `https://craftserver.onrender.com/v1/api/remove?store_bucket_id=${store_bucket_id}&modified_urls=${imageUrls}`
+        ` https://craftserver.onrender.com/v1/api/remove?store_bucket_id=${store_bucket_id}&modified_urls=${imageUrls}`
       )
 
       const { error } = response.data
@@ -177,24 +179,30 @@ const TableStickyHeader = () => {
   }
 
   // Handle product edit
-  const handleEdit = (id, price, stock) => {
+  const handleEdit = (id, price, stock, name) => {
     setEditProductId(id)
     setEditPrice(price)
     setEditStock(stock)
+    setEditName(name)
   }
 
   // Handle saving edited product
   const handleSaveEdit = async () => {
     setIsLoading(true)
-    try {
-      
 
+    try {
       const response = await axios.post(
-        `https://craftserver.onrender.com/v1/api/update?store_name_id=${store_name_id}&user_id=${user_id}`,
-        { editPrice, editStock, editProductId }
+        ` https://craftserver.onrender.com/v1/api/update?store_name_id=${store_name_id}&user_id=${user_id}`,
+        {
+          editPrice,
+          editStock,
+          editSize,
+          editName,
+          editProductId
+        }
       )
 
-       const { error } = response.data
+      const { error } = response.data
 
       if (error) {
         setFailed(error.message)
@@ -345,7 +353,7 @@ const TableStickyHeader = () => {
                           horizontal: 'center'
                         }}
                       >
-                        <MenuItem onClick={() => handleEdit(row.id, row.price, row.stock)}>Edit</MenuItem>
+                        <MenuItem onClick={() => handleEdit(row.id, row.price, row.stock, row.name)}>Edit</MenuItem>
                         <MenuItem onClick={() => handleDelete(row.id)} disabled={Boolean(deleteLoadingId === row.id)}>
                           Delete
                         </MenuItem>
@@ -377,10 +385,31 @@ const TableStickyHeader = () => {
           <Grid item xs={12} sm={3}>
             <FormControl fullWidth>
               <TextField
+                label='Product Name'
+                type='text'
+                value={editName}
+                onChange={e => setEditName(e.target.value)}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <FormControl fullWidth>
+              <TextField
                 label='Price(₦)'
                 type='number'
                 value={editPrice}
                 onChange={e => setEditPrice(e.target.value)}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <FormControl fullWidth>
+              <TextField
+                label='New Sizes'
+                type='text'
+                placeholder='40,XL,45'
+               value={editSize}
+      onChange={(e) => setEditSize(e.target.value.split(',').map((item) => item.trim()))}
               />
             </FormControl>
           </Grid>

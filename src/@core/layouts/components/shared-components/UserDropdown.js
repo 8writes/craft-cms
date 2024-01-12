@@ -57,10 +57,14 @@ const UserDropdown = () => {
     }
   }
 
-const handleLogout = async () => {
+  const handleLogout = async () => {
+
+  // Remove session from local storage
+    localStorage.removeItem('auth-token');
+    
   try {
 
-    const response = await axios.post('https://craftserver.onrender.com/v1/api/signout');
+    const response = await axios.post(' https://craftserver.onrender.com/v1/api/signout');
 
     const { error } = response.data;
 

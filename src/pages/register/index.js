@@ -89,7 +89,7 @@ const RegisterPage = () => {
     setLoading(true)
 
     try {
-      const response = await axios.post('https://craftserver.onrender.com/v1/api/signup', {
+      const response = await axios.post(' https://craftserver.onrender.com/v1/api/signup', {
         email,
         password,
         firstName,

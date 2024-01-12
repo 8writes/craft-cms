@@ -56,7 +56,7 @@ const LoginPage = () => {
     setLoading(true)
 
     try {
-      const response = await axios.post('https://craftserver.onrender.com/v1/api/login', {
+      const response = await axios.post(' https://craftserver.onrender.com/v1/api/login', {
         email: email,
         password: password
       })

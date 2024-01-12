@@ -80,7 +80,7 @@ const Trial = () => {
       // Extract only the date part in the format "YYYY-MM-DD"
       const planValidity = oneMonthLater.toISOString().substring(0, 10);
 
-      const response = await axios.post(`https://craftserver.onrender.com/v1/api/updateuser?id=${userSessionData.id}`, {
+      const response = await axios.post(` https://craftserver.onrender.com/v1/api/updateuser?id=${userSessionData.id}`, {
         store_name_id,
         subscription: 'Trial',
         trial: true,

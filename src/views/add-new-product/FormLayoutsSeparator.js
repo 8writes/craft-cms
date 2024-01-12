@@ -31,7 +31,6 @@ const ButtonStyled = styled(Button)(({ theme }) => ({
   }
 }))
 
-
 const url = process.env.URL
 
 const FormLayoutsSeparator = () => {
@@ -53,6 +52,7 @@ const FormLayoutsSeparator = () => {
   const [productSizes, setProductSizes] = useState([])
   const [productCount, setProductCount] = useState(0)
   const [selectedImages, setSelectedImages] = useState([])
+  const [sizes, setSizes] = useState([])
 
   const MAX_IMAGES = 4 // Maximum number of images allowed
 
@@ -102,7 +102,7 @@ const FormLayoutsSeparator = () => {
       formData.append('file', file)
 
       const response = await axios.post(
-        `https://craftserver.onrender.com/v1/api/uploadfile?id=${user_id}&store_bucket_id=${store_bucket_id}`,
+        ` https://craftserver.onrender.com/v1/api/uploadfile?id=${user_id}&store_bucket_id=${store_bucket_id}`,
         formData,
         {
           headers: {
@@ -133,10 +133,12 @@ const FormLayoutsSeparator = () => {
       const currentDate = new Date()
       const date = currentDate.toISOString().split('T')[0]
 
-      // Filter out empty sizes
-      const sizes = productSizes.filter(size => size.trim() !== '')
-
       const ImgUrls = await Promise.all(selectedImages.map((_, index) => uploadImage(index)))
+
+      // Check if ImgUrls is null
+      if (!ImgUrls) {
+        setFailed('Error uploading images')
+      }
 
       // Prepare an array to store individual data objects
       const formData = {
@@ -152,8 +154,8 @@ const FormLayoutsSeparator = () => {
         uploaded_image_urls: ImgUrls
       }
 
-      const response = await axios.post(`https://craftserver.onrender.com/v1/api/insert?store_name_id=${store_name_id}`, {
-        formData,
+      const response = await axios.post(` https://craftserver.onrender.com/v1/api/insert?store_name_id=${store_name_id}`, {
+        formData
       })
 
       const { error } = response.data
@@ -166,7 +168,7 @@ const FormLayoutsSeparator = () => {
         setFailed('')
         setSuccess('Product Uploaded successfully!')
 
-         clearForm();
+        clearForm()
         window.location.reload(true)
       }
     } catch (error) {
@@ -180,11 +182,11 @@ const FormLayoutsSeparator = () => {
       handleDataCount()
     }
   }, [store_name_id])
-  
+
   // Function to fetch product count
   const handleDataCount = async () => {
     try {
-      const response = await axios.get(`https://craftserver.onrender.com/v1/api/fetch?store_name_id=${store_name_id}`)
+      const response = await axios.get(` https://craftserver.onrender.com/v1/api/fetch?store_name_id=${store_name_id}`)
 
       const { error, data } = response.data
 
@@ -193,7 +195,6 @@ const FormLayoutsSeparator = () => {
 
         return null
       } else {
-
         const dataCount = data ? data.length : 0
 
         setProductCount(dataCount)
@@ -203,13 +204,12 @@ const FormLayoutsSeparator = () => {
     }
   }
 
-
   // Function to handle the overall upload process
   const handleUpload = async () => {
     setLoading(true)
     setFormDisabled(true)
-   
-   await handleDataCount()
+
+    await handleDataCount()
 
     try {
       let subscriptionLimit
@@ -384,7 +384,7 @@ const FormLayoutsSeparator = () => {
               <TextField
                 fullWidth
                 label='Product Name'
-                placeholder='Input Product Name'
+                placeholder='Product Name'
                 id='productName'
                 name='productName'
                 type='text'
@@ -397,7 +397,7 @@ const FormLayoutsSeparator = () => {
               <TextField
                 fullWidth
                 label='Product Description'
-                placeholder='Input Product Description/Details'
+                placeholder='Product Description/Details'
                 id='productDescription'
                 name='productDescription'
                 type='text'
@@ -465,26 +465,22 @@ const FormLayoutsSeparator = () => {
               </FormControl>
             </Grid>
             <Grid container item xs={12} sm={6}>
-              {productSizes.map((size, index) => (
-                <div className='flex items-center my-1' key={index}>
-                  <TextField
-                    fullWidth
-                    type='text'
-                    label={`Product Size`}
-                    placeholder={`e.g., 36/XL`}
-                    value={size}
-                    disabled={formDisabled}
-                    onChange={e => handleSizeChange(index, e.target.value)}
-                  />
-                  <CloseRoundedIcon disabled={formDisabled} className='cursor-pointer mx-2' onClick={() => handleRemoveSize(index)} />
-                </div>
-              ))}
-              <div className='flex items-center my-2'>
-                <Button disabled={formDisabled} onClick={handleAddSize} variant='outlined' size='small'>
-                  <AddRoundedIcon />
-                  new size
-                </Button>
-              </div>
+              <FormControl fullWidth>
+                <TextField
+                  label='Sizes (max 10)'
+                  type='text'
+                  disabled={formDisabled}
+                  placeholder='e.g., 40,XL,45'
+                  value={sizes}
+                  onChange={e => {
+                    const inputSizes = e.target.value.split(',').map(item => item.trim())
+
+                    if (inputSizes.length <= 3) {
+                      setSizes(inputSizes)
+                    }
+                  }}
+                />
+              </FormControl>
             </Grid>
           </Grid>
         </CardContent>

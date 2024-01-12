@@ -28,7 +28,7 @@ export const UserProvider = ({ children }) => {
 
           const userSessionData = sessionData || null
           
-          const response = await axios.get(`https://craftserver.onrender.com/v1/api/fetchuser?id=${userSessionData.id}`)
+          const response = await axios.get(` https://craftserver.onrender.com/v1/api/fetchuser?id=${userSessionData.id}`)
           
           const { error, data } = response.data
 

@@ -83,7 +83,7 @@ const TableStickyHeader = () => {
   const fetchData = async () => {
     setSuspense(true)
     try {
-       const response = await axios.get(`https://craftserver.onrender.com/v1/api/fetch?store_order_id=${store_order_id}`)
+       const response = await axios.get(` https://craftserver.onrender.com/v1/api/fetch?store_order_id=${store_order_id}`)
 
       const { error, data } = response.data
 
@@ -121,7 +121,7 @@ const TableStickyHeader = () => {
 
     try {
      const response = await axios.post(
-        `https://craftserver.onrender.com/v1/api/delete?store_order_id=${store_order_id}&id=${id}&user_id=${user_id}`
+        ` https://craftserver.onrender.com/v1/api/delete?store_order_id=${store_order_id}&id=${id}&user_id=${user_id}`
       )
 
       const { error } = response.data
@@ -162,7 +162,7 @@ const TableStickyHeader = () => {
     setIsLoading(true)
     try {
       const response = await axios.post(
-        `https://craftserver.onrender.com/v1/api/update?store_order_id=${store_order_id}`,
+        ` https://craftserver.onrender.com/v1/api/update?store_order_id=${store_order_id}`,
         { editOrderStatus, editOrderId }
       )
 
