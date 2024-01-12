@@ -118,7 +118,7 @@ const TableStickyHeader = () => {
 
   const handleDelete = async id => {
     setDeleteLoadingId(id)
-
+ 
     try {
      const response = await axios.post(
         ` https://craftserver.onrender.com/v1/api/delete?store_order_id=${store_order_id}&id=${id}&user_id=${user_id}`
