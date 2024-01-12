@@ -475,8 +475,8 @@ const FormLayoutsSeparator = () => {
                   onChange={e => {
                     const inputSizes = e.target.value.split(',').map(item => item.trim())
 
-                    if (inputSizes.length <= 3) {
-                      setSizes(inputSizes)
+                    if (inputSizes.length <= 10) {
+                     setSizes(inputSizes.map(size => size.toUpperCase()));
                     }
                   }}
                 />

@@ -405,11 +405,16 @@ const TableStickyHeader = () => {
           <Grid item xs={12} sm={3}>
             <FormControl fullWidth>
               <TextField
-                label='New Sizes'
+                label='New Sizes (max 10)'
                 type='text'
                 placeholder='e.g., 40,XL,45'
                 value={editSize}
-                onChange={e => setEditSize(e.target.value.split(',').map(item => item.trim()))}
+                onChange={e => {
+                  const inputSizes = e.target.value.split(',').map(item => item.trim())
+                  if (inputSizes.length <= 10) {
+                    setEditSize(inputSizes.map(size => size.toUpperCase()))
+                  }
+                }}
               />
             </FormControl>
           </Grid>
