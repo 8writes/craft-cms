@@ -218,13 +218,13 @@ const FormLayoutsSeparator = () => {
           subscriptionLimit = 0
           break
         case 'Trial':
-          subscriptionLimit = 4
+          subscriptionLimit = 26
           break
         case 'Basic':
-          subscriptionLimit = 50
+          subscriptionLimit = 56
           break
         case 'Premium':
-          subscriptionLimit = 100
+          subscriptionLimit = 106
           break
         default:
           subscriptionLimit = 0
@@ -325,12 +325,12 @@ const FormLayoutsSeparator = () => {
                 {selectedImages &&
                   selectedImages.map((image, index) => (
                     <Box key={index}>
-                      <ButtonStyled component='label' variant='text'>
+                      <div className='flex my-5'>
                         {image && (
                           <img
                             src={URL.createObjectURL(image)}
                             alt={`Selected Image ${index + 1}`}
-                            style={{ width: '60px', height: '60px', marginRight: '8px', borderRadius: '5px' }}
+                            style={{ width: '77px', height: '80px', marginRight: '8px', borderRadius: '5px' }}
                           />
                         )}
                         <input
@@ -346,6 +346,7 @@ const FormLayoutsSeparator = () => {
                         <Button
                           size='small'
                           color='error'
+                          variant='text'
                           disabled={formDisabled}
                           onClick={() => {
                             setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index))
@@ -353,14 +354,14 @@ const FormLayoutsSeparator = () => {
                         >
                           <CloseRoundedIcon />
                         </Button>
-                      </ButtonStyled>
+                      </div>
                     </Box>
                   ))}
                 <Box>
-                  <ButtonStyled variant='text' onClick={handleAddMoreImages} disabled={formDisabled}>
-                    <AddRoundedIcon sx={{ width: '50px', height: '50px' }} disabled={formDisabled} />
+                  <div className='px-5 cursor-pointer' onClick={handleAddMoreImages} disabled={formDisabled}>
+                    <AddRoundedIcon sx={{ width: '31px', height: '50px' }} disabled={formDisabled} />
                     Add Image
-                  </ButtonStyled>
+                  </div>
                   <input
                     hidden
                     type='file'
@@ -401,6 +402,8 @@ const FormLayoutsSeparator = () => {
                 placeholder='Product Description/Details'
                 id='productDescription'
                 name='productDescription'
+                multiline
+          rows={4}
                 type='text'
                 disabled={formDisabled}
                 value={productDescription}

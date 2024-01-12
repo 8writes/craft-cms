@@ -85,7 +85,7 @@ const Trial = () => {
         subscription: 'Trial',
         trial: true,
         plan_validity: planValidity,
-        product_count: '4'
+        product_count: '26'
       });
 
       const { error } = response.data;
@@ -204,7 +204,7 @@ const Trial = () => {
               </Typography>
               <Divider />
               <Typography variant='body1' gutterBottom>
-                Max Products: 4
+                Max Products: 26
               </Typography>
             </FormControl>
           </DialogContent>
