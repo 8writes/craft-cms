@@ -407,9 +407,9 @@ const TableStickyHeader = () => {
               <TextField
                 label='New Sizes'
                 type='text'
-                placeholder='40,XL,45'
-               value={editSize}
-      onChange={(e) => setEditSize(e.target.value.split(',').map((item) => item.trim()))}
+                placeholder='e.g., 40,XL,45'
+                value={editSize}
+                onChange={e => setEditSize(e.target.value.split(',').map(item => item.trim()))}
               />
             </FormControl>
           </Grid>
