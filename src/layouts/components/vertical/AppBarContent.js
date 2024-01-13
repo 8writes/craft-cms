@@ -32,7 +32,7 @@ const AppBarContent = props => {
             </IconButton>
           </>
         )}
-        <Alert  variant='text' sx={{color: 'yellow'}} severity='warning'>
+        <Alert  variant='text' sx={{color: 'red'}} severity='warning'>
           BETA
         </Alert>
       </Box>

@@ -129,7 +129,7 @@ const LoginPage = () => {
             <Typography variant='h5' sx={{ fontWeight: 600, marginBottom: 1.5 }}>
               Welcome back!
             </Typography>
-            <Typography variant='body2'>Please sign-in to your access your account</Typography>
+            <Typography variant='body2'>Please sign-in to access your account</Typography>
           </Box>
           <form noValidate method='POST' autoComplete='on' onSubmit={e => e.preventDefault()}>
             <TextField

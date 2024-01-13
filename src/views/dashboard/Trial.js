@@ -234,7 +234,7 @@ const Trial = () => {
                 Plan: Basic
               </Typography>
               <Typography variant='body1' gutterBottom>
-                Amount: ₦5000 (NGN)
+                Amount: ₦5,000 (NGN)
               </Typography>
               <Typography variant='body1' gutterBottom>
                 Valid for: 1 month
