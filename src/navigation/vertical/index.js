@@ -37,11 +37,6 @@ const navigation = () => {
       path: '/orders'
     },
     {
-      icon: QueryStatsRoundedIcon,
-      title: 'Analytics',
-      path: '#'
-    },
-    {
       sectionTitle: 'User Account'
     },
     {
@@ -56,7 +51,7 @@ const navigation = () => {
     },
      {
       icon: StoreRoundedIcon,
-      title: 'My Store',
+      title: 'Manage Store',
       path: '#'
     },
     {

@@ -7,6 +7,11 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import Link from 'next/link'
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
+import { useState } from 'react'
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import ArrowOutwardRoundedIcon from '@mui/icons-material/ArrowOutwardRounded';
+import IosShareRoundedIcon from '@mui/icons-material/IosShareRounded';
 
 // Styled component for the triangle shaped background image
 const TriangleImg = styled('img')({
@@ -19,13 +24,28 @@ const TriangleImg = styled('img')({
 
 const Intro = () => {
   const userData = useUser()
+  const [isCopied, setIsCopied] = useState(false);
 
   const userEmail = userData?.email
   const userFirstName = userData?.first_name
+  const storeUrl = userData?.store_url
 
-  // ** Hook
-  const theme = useTheme()
-  const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
+  const handleCopyLink = () => {
+    const textField = document.createElement('textarea');
+    textField.innerText = `https://${storeUrl}`;
+    document.body.appendChild(textField);
+    textField.select();
+    document.execCommand('copy');
+    document.body.removeChild(textField);
+
+    // Set the copied state to true
+    setIsCopied(true);
+
+    // Reset the copied state after a short delay (e.g., 2 seconds)
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+  };
 
   return (
     <Card sx={{ position: 'relative' }}>
@@ -41,10 +61,18 @@ const Intro = () => {
         )}
         {userData ? (
           <>
-            <Typography variant='h6'></Typography>
             <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>
-              {userEmail}
+              <a href={`https://${storeUrl}`} target='_blank' rel='noreferrer'>
+                {storeUrl}<ArrowOutwardRoundedIcon sx={{ width: '18px', }}/>
+              </a>
+               <ContentCopyOutlinedIcon
+        sx={{ width: '20px', cursor: 'pointer', mx:'4px', color: isCopied ? 'green' : 'inherit' }}
+        onClick={handleCopyLink}
+      />
+              {isCopied && <span style={{ marginLeft: '5px', color: 'green' }}>Copied!</span>}
+              
             </Typography>
+            
           </>
         ) : (
           <>
@@ -52,22 +80,22 @@ const Intro = () => {
           </>
         )}
         {userData ? (
-          <>
+          <div className='flex justify-between'>
+             
             <div className='mt-5 flex justify-end '>
               <Link href='/add-new-product' passHref>
                 <Button size='medium' variant='outlined'>
-                  Add New Product
+                  <AddRoundedIcon />  Add Product
                 </Button>
               </Link>
             </div>
-          </>
+          </div>
         ) : (
           <>
             <Skeleton animation='wave' height={60} width={240} />
           </>
         )}
 
-        <TriangleImg alt='triangle background' src={`/images/misc/${imageSrc}`} />
       </CardContent>
     </Card>
   )

@@ -81,8 +81,14 @@ const UserDropdown = () => {
   } catch (error) {
     console.error('Error during logout:', error.message);
   } finally { 
+     // Remove session from local storage
+    localStorage.removeItem('auth-token');
+    
+    await router.push('/login');
+    
     // Trigger screen refresh
-     window.location.reload(true)
+    window.location.reload(true)
+    
   }
 };
 
