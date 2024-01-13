@@ -2,84 +2,36 @@ import { useUser } from 'src/@core/context/userDataContext'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import Avatar from '@mui/material/Avatar'
 import CardHeader from '@mui/material/CardHeader'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 
 // ** Icons Imports
 import TrendingUp from 'mdi-material-ui/TrendingUp'
-import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
-import DotsVertical from 'mdi-material-ui/DotsVertical'
-import CellphoneLink from 'mdi-material-ui/CellphoneLink'
-import AccountOutline from 'mdi-material-ui/AccountOutline'
 import TourOutlinedIcon from '@mui/icons-material/TourOutlined'
 import EmojiPeopleOutlinedIcon from '@mui/icons-material/EmojiPeopleOutlined'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
+import { Skeleton } from '@mui/material'
 
-const salesData = [
-  {
-    stats: '0',
-    title: 'Orders',
-    color: '',
-    icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '0',
-    title: 'Customers',
-    color: '',
-    icon: <AccountOutline sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '0',
-    color: '',
-    title: 'Products sold',
-    icon: <Inventory2OutlinedIcon sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '0',
-    color: '',
-    title: 'Website Visits',
-    icon: <TourOutlinedIcon sx={{ fontSize: '1.75rem' }} />
-  }
-]
-
-const renderStats = () => {
-  return salesData.map((item, index) => (
-    <Grid item xs={12} sm={3} key={index}>
-      <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar
-          variant='rounded'
-          sx={{
-            mr: 3,
-            width: 44,
-            height: 44,
-            boxShadow: 3,
-            color: 'common.white',
-            backgroundColor: `${item.color}.main`
-          }}
-        >
-          {item.icon}
-        </Avatar>
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant='caption'>{item.title}</Typography>
-          <Typography variant='h6'>{item.stats}</Typography>
-        </Box>
-      </Box>
-    </Grid>
-  ))
-}
 
 const Stats = () => {
   const userData = useUser()
 
+ // Loading skeleton
+  if (!userData) {
+    return (
+      <Card>
+        <CardContent>
+          <Skeleton variant='rectangular' width='100%' height={150} animation='wave' />
+        </CardContent>
+      </Card>
+    )
+  }
+  
   return (
     <Card>
       <CardHeader
-        
         subheader={
           <Typography variant='body2'>
             <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
