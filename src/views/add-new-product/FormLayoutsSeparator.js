@@ -23,6 +23,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import FormData from 'form-data'
+import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
@@ -321,7 +322,7 @@ const FormLayoutsSeparator = () => {
               </Typography>
             </Grid>
             <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '5px', alignItems: 'center'}}>
                 {selectedImages &&
                   selectedImages.map((image, index) => (
                     <Box key={index}>
@@ -358,10 +359,10 @@ const FormLayoutsSeparator = () => {
                     </Box>
                   ))}
                 <Box>
-                  <div className='px-5 cursor-pointer' onClick={handleAddMoreImages} disabled={formDisabled}>
-                    <AddRoundedIcon sx={{ width: '31px', height: '50px' }} disabled={formDisabled} />
+                  <div className=' grid cursor-pointer' onClick={handleAddMoreImages} disabled={formDisabled}>
+                  <span className='flex justify-center'> <FileUploadOutlinedIcon sx={{ width: '31px', height: '50px' }} disabled={formDisabled} /></span> 
                     Add Image
-                  </div>
+                  
                   <input
                     hidden
                     type='file'
@@ -370,7 +371,7 @@ const FormLayoutsSeparator = () => {
                       const file = e.target.files[0]
                       setSelectedImages(prevImages => [...prevImages, file])
                     }}
-                  />
+                  /></div>
                 </Box>
               </Box>
             </Grid>
@@ -390,9 +391,22 @@ const FormLayoutsSeparator = () => {
                 id='productName'
                 name='productName'
                 type='text'
+                sx={{pb: '6px'}}
                 disabled={formDisabled}
                 value={productName}
                 onChange={e => setProductName(e.target.value)}
+              />
+              <TextField
+                fullWidth
+                label='Price'
+                placeholder='e.g., 50000'
+                id='sellingPrice'
+                name='sellingPrice'
+                type='tel'
+                 sx={{pt: '6px'}}
+                disabled={formDisabled}
+                value={sellingPrice}
+                onChange={e => setSellingPrice(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -410,19 +424,7 @@ const FormLayoutsSeparator = () => {
                 onChange={e => setProductDescription(e.target.value)}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label='Selling Price'
-                placeholder='e.g., 50000'
-                id='sellingPrice'
-                name='sellingPrice'
-                type='tel'
-                disabled={formDisabled}
-                value={sellingPrice}
-                onChange={e => setSellingPrice(e.target.value)}
-              />
-            </Grid>
+           
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
                 <InputLabel id='form-layouts-separator-select-label'>Product Category</InputLabel>
@@ -445,13 +447,12 @@ const FormLayoutsSeparator = () => {
                   <MenuItem value='Home Living'>Home and Living</MenuItem>
                   <MenuItem value='Beauty Care'>Beauty and Personal Care</MenuItem>
                   <MenuItem value='Sports Outdoors'>Sports and Outdoors</MenuItem>
-                  <MenuItem value='Books Music Media'>Books, Music and Media </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel id='form-layouts-separator-select-label'>Inventory</InputLabel>
+                <InputLabel id='form-layouts-separator-select-label'>Stock Inventory</InputLabel>
                 <Select
                   label='Product Inventory'
                   defaultValue=''
@@ -471,7 +472,7 @@ const FormLayoutsSeparator = () => {
             <Grid container item xs={12} sm={6}>
               <FormControl fullWidth>
                 <TextField
-                  label='Sizes (max 10)'
+                  label='Size(s) (max 10)'
                   type='text'
                   disabled={formDisabled}
                   placeholder='e.g., 40,XL,45'

@@ -38,7 +38,7 @@ const navigation = () => {
     },
     {
       icon: QueryStatsRoundedIcon,
-      title: 'Statistics',
+      title: 'Analytics',
       path: '#'
     },
     {
@@ -56,7 +56,7 @@ const navigation = () => {
     },
      {
       icon: StoreRoundedIcon,
-      title: 'Store Template',
+      title: 'My Store',
       path: '#'
     },
     {
