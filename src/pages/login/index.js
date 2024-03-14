@@ -133,8 +133,8 @@ const LoginPage = () => {
           </Box>
           <form noValidate method='POST' autoComplete='on' onSubmit={e => e.preventDefault()}>
             <TextField
-              autoFocus
               fullWidth
+              autoFocus
               label='Email'
               id='email'
               type='email'
@@ -178,7 +178,6 @@ const LoginPage = () => {
               disabled={isDisabled}
               sx={{ marginBottom: 7 }}
               onClick={handleLogin}
-              autoFocus
             >
               Login
             </LoadingButton>

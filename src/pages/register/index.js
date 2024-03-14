@@ -169,8 +169,8 @@ const RegisterPage = () => {
               name='firstName'
               type='text'
               fullWidth
-              value={firstName}
               placeholder='First Name'
+              value={firstName}
               onChange={e => setFirstName(e.target.value)}
               id='firstName'
               label='First Name'

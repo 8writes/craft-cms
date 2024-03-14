@@ -61,7 +61,7 @@ const Intro = () => {
         )}
         {userData ? (
           <>
-            <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>
+            <Typography variant='body2'>
               <a href={`https://${storeUrl}`} target='_blank' rel='noreferrer'>
                 {storeUrl}<ArrowOutwardRoundedIcon sx={{ width: '18px', }}/>
               </a>

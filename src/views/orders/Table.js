@@ -113,7 +113,7 @@ const TableStickyHeader = () => {
   }
 
   const handleSearch = id => {
-    fetchData(id) // Trigger fetch data with the search term
+    fetchData(id)
   }
 
   const handleDelete = async id => {

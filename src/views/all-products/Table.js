@@ -91,16 +91,14 @@ const TableStickyHeader = () => {
   // Fetch product
 
   useEffect(() => {
-    if (store_name_id) {
       fetchData()
-    }
-  }, [store_name_id])
+  }, [])
 
   const fetchData = async () => {
     setSuspense(true)
 
     try {
-      const response = await axios.get(` https://craftserver.onrender.com/v1/api/fetch?store_name_id=${store_name_id}`)
+      const response = await axios.get(` https://craaft.onrender.com/v1/api/fetch?store_name_id=${store_name_id}`)
 
       const { error, data } = response.data
 
@@ -237,6 +235,21 @@ const TableStickyHeader = () => {
     setPage(0)
   }
 
+  const renderTableCellContent = (column, row) => {
+  if (column.id === 'size' && Array.isArray(row[column.id])) {
+    return row[column.id].map((size, index) => (
+      <span key={index}>
+        {size}
+        {index < row[column.id].length - 1 && ', '}
+      </span>
+    ));
+  } else if (column.format && typeof row[column.id] === 'number') {
+    return column.format(row[column.id]);
+  } else {
+    return row[column.id];
+  }
+  };
+  
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       {success && (
@@ -294,11 +307,9 @@ const TableStickyHeader = () => {
             <TableBody>
               <TableRow>
                 {columns.map(column => (
-                  <>
-                    <TableCell key={column.id}>
-                      <Skeleton animation='wave' />
-                    </TableCell>
-                  </>
+                  <TableCell key={column.id}>
+                    <Skeleton animation='wave' />
+                  </TableCell>
                 ))}
                 <TableCell>
                   <Skeleton animation='wave' />
@@ -306,30 +317,18 @@ const TableStickyHeader = () => {
               </TableRow>
             </TableBody>
           ) : (
-            <>
               <TableBody>
                 {tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
-                  <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
+                  <TableRow hover type='checkbox' tabIndex={-1} key={row.id}>
                     {columns.map(column => (
                       <TableCell key={column.id} align={column.align}>
                         {column.id === 'image' && row.image ? (
                           <img
                             src={`${row.image[0]}`}
-                            alt={`Product ${row.sn} Image`}
+                            alt={`Product ${row.sn}`}
                             style={{ width: '60px', height: '50px', borderRadius: '5px' }}
                           />
-                        ) : column.id === 'size' ? (
-                          row[column.id].map((size, index) => (
-                            <span key={index}>
-                              {size}
-                              {index < row[column.id].length - 1 && ', '}
-                            </span>
-                          ))
-                        ) : column.format && typeof row[column.id] === 'number' ? (
-                          column.format(row[column.id])
-                        ) : (
-                          row[column.id]
-                        )}
+                        ) : renderTableCellContent(column, row)}
                       </TableCell>
                     ))}
                     <TableCell>
@@ -362,7 +361,6 @@ const TableStickyHeader = () => {
                   </TableRow>
                 ))}
               </TableBody>
-            </>
           )}
         </Table>
 
